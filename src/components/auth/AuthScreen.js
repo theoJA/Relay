@@ -1,9 +1,15 @@
-import React, { Component } from 'react'
-import { View, Text, Image } from 'react-native'
-import { Button } from '../common/Button'
+import React, { Component } from 'react';
+import { View, Text, Image, Linking } from 'react-native';
+import { Button } from '../common/Button';
 
-class AuthScreen extends Component {
+export default class AuthScreen extends Component {
+
+  static navigationOptions = {
+    header: null,
+  };
+
   render() {
+    const { navigate } = this.props.navigation;
     return (
       <View style={Styles.container}>
         <Text style={Styles.authTitle}>ToGoNotes</Text>
@@ -13,18 +19,32 @@ class AuthScreen extends Component {
         />
         <Text style={Styles.subTitle}>Bite-sized knowledge.</Text>
         <Text style={Styles.subTitle}>Anytime. Anywhere.</Text>
-        <Button>Get Started</Button>
+        <Button
+          onPress={() => navigate('SignUp')}
+          title="Get Started"
+        />
+        
+        <Text style={Styles.alreadyAMember}>
+          Already a member?
+          <Text> </Text>
+          <Text style={{color: 'blue'}}
+            onPress={() => Linking.openURL('http://google.com')}>
+            Sign in
+          </Text>
+        </Text>
       </View>
-    )
-  }
+    );
+  };
 }
 
 const Styles = {
   authTitle: {
+    marginBottom: 10,
     fontSize: 40,
     fontWeight: 'bold'
   },
   appLogo: {
+    marginBottom: 10,
     height: 200,
     width: 200
   },
@@ -37,6 +57,7 @@ const Styles = {
   subTitle: {
     fontSize: 20
   },
+  alreadyAMember: {
+    marginTop: 20
+  }
 }
-
-export default AuthScreen
