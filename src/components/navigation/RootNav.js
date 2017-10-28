@@ -1,13 +1,13 @@
 
 import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
-import AuthScreen from '../auth/AuthScreen';
+import LogoScreen from '../auth/LogoScreen';
 import GetStarted from '../auth/GetStarted';
 
-export const AuthNav = StackNavigator(
+const AuthNav = StackNavigator(
   {
-    MainAuth: {
-      screen: AuthScreen,
+    Logo: {
+      screen: LogoScreen,
     },
     SignUp: {
       screen: GetStarted,
