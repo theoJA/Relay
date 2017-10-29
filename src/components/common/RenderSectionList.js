@@ -40,7 +40,7 @@ export default class SectList extends Component {
   render() {
     return (
       <Accordion
-        underlayColor='#85929E'
+        underlayColor='#fff'
         sections={SECTIONS}
         renderHeader={this._renderHeader}
         renderContent={this._renderContent}
