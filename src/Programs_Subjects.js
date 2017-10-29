@@ -4,30 +4,30 @@ export const programs = [
 ]
 
 export const computerScience = [
-  { key: '1' , subject: 'General Computer Science' },
-  { key: '2' , subject: 'Discrete Structures' },
-  { key: '3' , subject: 'Systems Programming' },
-  { key: '4' , subject: 'Data Structures and Algorithms' },
-  { key: '5' , subject: 'Software Engineering' },
-  { key: '6' , subject: 'Web Applications' },
-  { key: '7' , subject: 'Mobile Applications' },
-  { key: '8' , subject: 'Operating Systems' },
-  { key: '9' , subject: 'Object-Oriented Programming' },
-  { key: '10' ,subject: 'Databases' },
-  { key: '11' ,subject: 'Human-Computer Interaction' },
-  { key: '12' , subject: 'Programming Paradigms' },
-  { key: '13' , subject: 'Computer Networks' },
-  { key: '14' , subject: 'Advanced Algorithms' },
-  { key: '15' , subject: 'Artificial Intelligence' },
-  { key: '16' , subject: 'Cryptography' },
-  { key: '17' , subject: 'Security' }
+  { subject: 'Advanced Algorithms' },
+  { subject: 'Artificial Intelligence' },
+  { subject: 'Computer Networks' },
+  { subject: 'Cryptography' },
+  { subject: 'Data Structures and Algorithms' },
+  { subject: 'Databases' },
+  { subject: 'Discrete Structures' },
+  { subject: 'General Topics' },
+  { subject: 'Human-Computer Interaction' },
+  { subject: 'Mobile Development' },
+  { subject: 'Object-Oriented Programming' },
+  { subject: 'Operating Systems' },
+  { subject: 'Programming Paradigms' },
+  { subject: 'Security' },
+  { subject: 'Software Engineering Concepts' },
+  { subject: 'Systems Programming' },
+  { subject: 'Web Development' }
 ];
 
 export const engineering = [
-  { key: '18' , subject: 'Mechanical' },
-  { key: '19' , subject: 'Electrical' },
-  { key: '20' , subject: 'Environmental' },
-  { key: '19' , subject: 'Aerospace' },
-  { key: '18' , subject: 'Biomedical and Mechanical' },
-  { key: '18' , subject: 'Biomedical and Electrical' }
+  { subject: 'Aerospace' },
+  { subject: 'Biomedical and Electrical' },
+  { subject: 'Biomedical and Mechanical' },
+  { subject: 'Electrical' },
+  { subject: 'Environmental' },
+  { subject: 'Mechanical' }
 ];
