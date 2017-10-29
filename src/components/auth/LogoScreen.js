@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Image, Linking } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Button } from '../common/Button';
 
 export default class AuthScreen extends Component {
@@ -21,18 +21,23 @@ export default class AuthScreen extends Component {
         <Text style={Styles.subTitle}>Bite-sized knowledge.</Text>
         <Text style={Styles.subTitle}>Anytime. Anywhere.</Text>
         <Button
-          onPress={() => navigate('SignUp')}
+          onPress={() => navigate('Interests')}
           title="Get Started"
         />
         
-        <Text style={Styles.alreadyAMember}>
-          Already a member?
-          <Text> </Text>
-          <Text style={{color: 'blue'}}
-            onPress={() => Linking.openURL('http://google.com')}>
-            Sign in
+        <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
+          <Text style={Styles.alreadyAMember}>
+            Already a member?
+            <Text> </Text>
           </Text>
-        </Text>
+          <TouchableOpacity
+              onPress={() => navigate('SignIn')} 
+          >
+            <Text style={{color: 'blue'}}>
+              Sign in
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -59,6 +64,6 @@ const Styles = {
     fontSize: 20
   },
   alreadyAMember: {
-    marginTop: 20
+    marginTop: 15
   }
 }
