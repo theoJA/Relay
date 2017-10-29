@@ -2,15 +2,23 @@
 import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
 import LogoScreen from '../auth/LogoScreen';
-import GetStarted from '../auth/GetStarted';
+import Interests from '../auth/Interests';
+import SignUp from "../auth/SignUp";
+import SignIn from "../auth/SignIn";
 
 const AuthNav = StackNavigator(
   {
     Logo: {
       screen: LogoScreen,
     },
+    Interests: {
+      screen: Interests,
+    },
     SignUp: {
-      screen: GetStarted,
+      screen: SignUp,
+    },
+    SignIn: {
+      screen: SignIn,
     },
   },
 );
