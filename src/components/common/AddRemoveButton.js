@@ -15,11 +15,9 @@ export class AddRemoveButton extends Component {
   changeButtonColor() {
     if (!this.state.isAdded) {
       this.setState({ isAdded: true, buttonSymbol: '-', buttonColor: '#E74C3C' })
-      alert(this.props.id)
     }
     else {
       this.setState({ isAdded: false, buttonSymbol: '+', buttonColor: '#9CCC65' })
-      alert(this.props.id)
     }
   }
 
@@ -42,7 +40,8 @@ export class AddRemoveButton extends Component {
 
 const Styles = {
   addOrRemTextStyle: {
-    color: '#000'
+    color: '#000',
+    fontWeight: 'bold'
   },
   addOrRemButtonStyle: {
     alignItems: 'center',
