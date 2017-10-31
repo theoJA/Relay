@@ -7,27 +7,27 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { programs, computerScience } from '../../Programs_Subjects'
-import { CardSection } from '../common';
 import RenderSectionList from "../common/RenderSectionList";
 
 export default class GetStarted extends Component {
 
   static navigationOptions = ({ navigation }) => {
+    let headerRight = (
+      <TouchableOpacity
+        onPress={() => {navigation.navigate('Register')}}
+      >
+        <View style={{marginRight: 10, borderColor: '#000', borderRadius: 5, borderWidth: 1, padding: 5}}>
+          <Text style={{fontSize: 16}}>
+            Next
+          </Text>
+        </View>
+      </TouchableOpacity>
+    )
     return {
       title: 'Interests',
       headerTitleStyle: {alignSelf: 'center'},
       headerStyle: { marginTop: Expo.Constants.statusBarHeight },
-      headerRight: (
-          <TouchableOpacity
-            onPress={() => {navigation.navigate('SignUp')}}
-          >
-            <View style={{marginRight: 10, borderColor: '#000', borderRadius: 5, borderWidth: 1, padding: 5}}>
-              <Text style={{fontSize: 16}}>
-                Next
-              </Text>
-            </View>
-          </TouchableOpacity>
-      ),
+      headerRight,
     };
   };
 
@@ -35,11 +35,10 @@ export default class GetStarted extends Component {
   render() {
     return (
       <View style={Styles.container}>
-        <CardSection>
-          <Text style={Styles.TextStyle}>
-            Select a program and then select subjects or fields of interest:
-          </Text>
-        </CardSection>
+        <Text style={Styles.TextStyle}>
+          Select a program and add at least 
+          <Text style={{fontWeight: 'bold'}}> one </Text>field of interest:
+        </Text>
         <ScrollView>
           <RenderSectionList />
         </ScrollView>
@@ -52,14 +51,14 @@ const Styles = {
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#ECEFF1',
   },
   TextStyle: {
     textAlign: 'center', 
     fontSize: 14,
     paddingLeft: 65,
     paddingRight: 65,
-    paddingTop: 5,
-    paddingBottom: 5
+    paddingTop: 10,
+    paddingBottom: 10
   }
 }
