@@ -3,8 +3,10 @@ import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
 import LogoScreen from '../auth/LogoScreen';
 import Interests from '../auth/Interests';
-import SignUp from "../auth/SignUp";
+import Register from "../auth/Register";
 import SignIn from "../auth/SignIn";
+import RegisterEmail from '../auth/RegisterEmail';
+import SignInEmail from "../auth/SignInEmail";
 
 const AuthNav = StackNavigator(
   {
@@ -14,11 +16,17 @@ const AuthNav = StackNavigator(
     Interests: {
       screen: Interests,
     },
-    SignUp: {
-      screen: SignUp,
+    Register: {
+      screen: Register,
+    },
+    RegisterEmail: {
+      screen: RegisterEmail,
     },
     SignIn: {
       screen: SignIn,
+    },
+    SignInEmail: {
+      screen: SignInEmail,
     },
   },
 );
