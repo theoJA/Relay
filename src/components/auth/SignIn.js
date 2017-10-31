@@ -2,44 +2,50 @@ import React, { Component } from "react";
 import { View, Text, Button, TouchableOpacity } from "react-native";
 import { OauthButton } from '../common/OauthButton'
 
-export default class SignUp extends Component {
+export default class SignIn extends Component {
 
   static navigationOptions = ({ navigation }) => {
+    const { params = {} } = navigation.state;
+    let headerRight = (
+      <View style={{marginRight: 10}}>
+      </View>
+    );
     return {
       title: 'Sign In',
       headerTitleStyle: {alignSelf: 'center'},
       headerStyle: { marginTop: Expo.Constants.statusBarHeight },
-      headerRight: (
-          <TouchableOpacity
-            onPress={() => {alert('Im signing in')}}
-          >
-            <View style={{marginRight: 10, borderColor: '#000', borderRadius: 5, borderWidth: 1, padding: 5}}>
-              <Text style={{fontSize: 16}}>
-                Next
-              </Text>
-            </View>
-          </TouchableOpacity>
-      ),
+      headerRight
     };
   };
 
+  componentDidMount() {
+    this.props.navigation.setParams({ tellWhereMansAt: this.whereAmIAt });
+  }
+
+  whereAmIAt = () => {
+    alert('Im in sign in bruv. Mans not hot');
+  }
+
   render() {
+    const { navigate } = this.props.navigation;
     return (
-      <View>
+      <View style={Styles.container}>
         <TouchableOpacity>
-          <OauthButton name="logo-google" size={32} color="black" />
+          <OauthButton name="logo-google" size={32} color="white" buttonColor="#EC7063" buttonTitle="Continue with Google"/>
         </TouchableOpacity>
 
         <TouchableOpacity>
-        <OauthButton name="logo-facebook" size={32} color="black" />
+        <OauthButton name="logo-facebook" size={32} color="white" buttonColor="#1565C0" buttonTitle="Continue with Facebook"/>
         </TouchableOpacity>
 
         <TouchableOpacity>
-        <OauthButton name="logo-twitter" size={32} color="black" />
+        <OauthButton name="logo-twitter" size={32} color="white" buttonColor="#4FC3F7" buttonTitle="Continue with Twitter"/>
         </TouchableOpacity>
 
-        <TouchableOpacity>
-        <OauthButton name="md-mail" size={32} color="black" />
+        <TouchableOpacity
+          onPress={() => navigate('SignInEmail')}
+        >
+        <OauthButton name="md-mail" size={32} color="white" buttonColor="#78909C" buttonTitle="Continue with Email"/>
         </TouchableOpacity>
       </View>
     )
@@ -47,7 +53,9 @@ export default class SignUp extends Component {
 }
 
 const Styles = {
-  googleLoginStyle: {
-
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#ECEFF1',
   }
 }
