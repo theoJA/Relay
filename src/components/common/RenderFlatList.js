@@ -28,7 +28,9 @@ export class RenderFlatList extends React.Component {
 
 const Styles = {
   container: {
-    flex: 1
+    flex: 1,
+    marginLeft: 5,
+    marginRight: 5
   },
   descStyle: {
     fontSize: 15,

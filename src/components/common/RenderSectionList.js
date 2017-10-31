@@ -29,7 +29,7 @@ export default class SectList extends Component {
   // make an external component to handle the array so that the header only has one child component
   _renderContent(section) {
     return (
-      <View style={{ height: 300 }}>
+      <View style={Styles.contentStyle}>
         <RenderFlatList 
           content={section.content}
         />
@@ -51,7 +51,7 @@ export default class SectList extends Component {
 
 const Styles = {
   headerStyle: {
-    backgroundColor: '#000',
+    backgroundColor: '#273746',
     paddingLeft: 15,
     borderBottomWidth: 2,
     borderColor: '#ddd',
@@ -64,5 +64,8 @@ const Styles = {
     paddingBottom: 15,
     fontWeight: 'bold',
     color: '#fff'
+  },
+  contentStyle: {
+    height: 300
   }
 }
