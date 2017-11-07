@@ -7,10 +7,18 @@ import {
   KeyboardAvoidingView
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { NavigationActions } from 'react-navigation';
 
 export default class SignInEmail extends Component {
   
-  
+  // resets the navigation stack to go to another parent stack nav
+  // --> NEEDS FIXING!!!!!!
+  changeToAppNavStack = NavigationActions.reset({
+    index: 0,
+    actions: [
+      NavigationActions.navigate({routeName: 'Home'}),
+    ]
+  });
 
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
@@ -42,7 +50,8 @@ export default class SignInEmail extends Component {
   }
 
   signUpUser = () => {
-    alert('signing in')
+    alert('signing in');
+    this.props.navigation.dispatch(this.changeToAppNavStack);
   }
 
   render() {

@@ -1,12 +1,8 @@
 
 import React, { Component } from 'react';
 import { StackNavigator } from 'react-navigation';
-import LogoScreen from '../auth/LogoScreen';
-import Interests from '../auth/Interests';
-import Register from "../auth/Register";
-import SignIn from "../auth/SignIn";
-import RegisterEmail from '../auth/RegisterEmail';
-import SignInEmail from "../auth/SignInEmail";
+import {LogoScreen, Interests, Register, SignIn, RegisterEmail, SignInEmail } from '../auth';
+import { Home } from '../inApp';
 
 const AuthNav = StackNavigator(
   {
@@ -27,6 +23,9 @@ const AuthNav = StackNavigator(
     },
     SignInEmail: {
       screen: SignInEmail,
+    },
+    Home: {
+      screen: Home,
     },
   },
 );
