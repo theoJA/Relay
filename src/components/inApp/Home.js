@@ -1,18 +1,52 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
-import NavBar from "../common/NavBar";
+import { View, Text, TouchableOpacity } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
 
 export default class Home extends Component {
 
-  static navigationOptions = {
-    header: null,
-    headerStyle: { marginTop: Expo.Constants.statusBarHeight },
+  static navigationOptions = ({ navigation }) => {
+    const { params = {} } = navigation.state;
+    
+    let headerLeft = (
+      <View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('DrawerOpen')}
+        >
+          <Ionicons style={Styles.iconStyle} name="md-menu" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+    );
+  
+    let headerRight = (
+      <View style={Styles.navbarItemStyle}>
+        <TouchableOpacity>
+          <Ionicons style={Styles.iconStyle} name="ios-add-circle" size={32} color="white" />
+        </TouchableOpacity>
+          
+        <TouchableOpacity>
+          <Ionicons style={Styles.iconStyle} name="ios-funnel" size={32} color="white" />
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Ionicons style={Styles.iconStyle} name="md-search" size={32} color="white" />
+        </TouchableOpacity>
+      </View> 
+    );
+
+    return {
+      title: 'Home',
+      headerStyle: { backgroundColor: '#273746', marginTop: Expo.Constants.statusBarHeight },
+      headerTitleStyle: { color: 'white'},
+      headerRight,
+      headerLeft,
+    };
   };
+
 
   render() {
     return (
-      <View>
-        <NavBar />
+      <View style={Styles.container}>
+        <Text>A list of notes</Text>
       </View>
     )
   }
@@ -21,7 +55,12 @@ export default class Home extends Component {
 const Styles = {
   container: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: '#ECEFF1',
+  },
+  navbarItemStyle: {
+    flexDirection: 'row',
+  },
+  iconStyle: {
+    padding: 10
   }
 }
