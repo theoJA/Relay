@@ -16,10 +16,10 @@ export default class SignInEmail extends Component {
   changeToAppNavStack = NavigationActions.reset({
     index: 0,
     actions: [
-      NavigationActions.navigate({routeName: 'Home'}),
+      NavigationActions.navigate({routeName: 'Drawer'}),
     ]
   });
-
+  
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     let title = (
