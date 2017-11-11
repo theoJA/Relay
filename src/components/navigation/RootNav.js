@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { View, Text, TouchableOpacity } from "react-native";
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
 import {LogoScreen, Interests, Register, SignIn, RegisterEmail, SignInEmail } from '../auth';
-import { Home, MyNotes, Bookmarked, AppSettings } from '../inApp';
+import { Home, MyNotes, Bookmarked, AppSettings, CreateNote } from '../inApp';
 import DrawerContent from "../common/DrawerContent";
 import { Ionicons } from '@expo/vector-icons';
 
@@ -17,6 +17,9 @@ const HomeStack = StackNavigator({
         label: 'Home',
       },
     },
+  },
+  CreateNote: {
+    screen: CreateNote,
   },
 });
 
