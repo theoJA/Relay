@@ -1,21 +1,9 @@
 import React, { Component } from "react";
-import { StyleSheet,
-  Image, View, Button, Text, TouchableOpacity, TextInput, ScrollView, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { ImagePicker } from 'expo';
-import getRNDraftJSBlocks from 'react-native-draftjs-render';
-import data from "./resourceMock.json";
-
-import { MyApp } from "./WYSIWYG";
+import NoteEditor from '../common/NoteEditor'
 
 export default class CreateNote extends Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      image: null,
-    }
-  }
 
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
@@ -41,63 +29,11 @@ export default class CreateNote extends Component {
   };
 
 
-  _pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-
-    console.log(result);
-
-    if (!result.cancelled) {
-      this.setState({ image: result.uri });
-    }
-  };
-
   render() {
-    let { image } = this.state;
     return (
       <View style={Styles.container}>
 
-        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-          <TouchableOpacity>
-            <Button
-              title="New Paragraph"
-              onPress={() => {}}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Button
-              title="Insert Image"
-              onPress={this._pickImage}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <KeyboardAvoidingView 
-          style={Styles.container}
-          behavior="padding"
-        >
-        <ScrollView>
-          
-          {image &&
-            <Image source={{ uri: image }} style={{ width: 200, height: 200, margin: 10 }} />}
-          
-
-          <TextInput
-            style={Styles.textInput}
-            multiline={true}
-            numberOfLines={4}
-            selectTextOnFocus={false}
-            onChangeText={(text) => this.setState({text})}
-            value={this.state.image} />
-          
-          
-          <MyApp />
-
-
-        </ScrollView>
-        </KeyboardAvoidingView>
+        <NoteEditor/>
             
 
       </View>
@@ -106,7 +42,7 @@ export default class CreateNote extends Component {
   }
 }
 
-const Styles = {
+const Styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ECEFF1',
@@ -129,4 +65,4 @@ const Styles = {
     borderWidth: 1, 
     padding: 5,
   }
-}
+});
