@@ -13,12 +13,12 @@ export default class AuthScreen extends Component {
     const { navigate } = this.props.navigation;
     return (
       <View style={Styles.container}>
-        <Text style={Styles.authTitle}>ToGoNotes</Text>
+        <Text style={Styles.authTitle}>Relay</Text>
         <Image
           style={Styles.appLogo}
           source={require('../../images/latest-logo.png')}
         />
-        <Text style={Styles.subTitle}>Bite-sized knowledge.</Text>
+        <Text style={Styles.subTitle}>Share your knowledge.</Text>
         <Text style={Styles.subTitle}>Anytime. Anywhere.</Text>
         <Button
           onPress={() => navigate('Interests')}
