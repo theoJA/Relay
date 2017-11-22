@@ -87,7 +87,7 @@ export default class CreateNote extends Component {
               onChangeText={(text) => this.setState({ title: text })}
               value={this.state.title}
               />
-              <TouchableOpacity onPress={() => {}} style={{ flex: 4 }}>
+              <TouchableOpacity onPress={() => {}} style={{ flex: 5 }}>
                 <Text style={[Styles.modalButton, { borderColor: '#000', borderRadius: 5, borderWidth: 1, }]}>Add Tag</Text>
               </TouchableOpacity>
             </View>
@@ -141,9 +141,11 @@ const Styles = StyleSheet.create({
   },
   modalButton: {
     borderRadius: 5,
-    padding: 5,
+    padding: 8,
     textAlign: 'center',
-    margin: 10
+    margin: 10,
+    borderWidth: 1,
+    fontWeight: 'bold',
   },
   textInputTitleStyle: {
     color: "#566573",
