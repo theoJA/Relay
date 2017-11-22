@@ -13,7 +13,7 @@ export default class AuthScreen extends Component {
     const { navigate } = this.props.navigation;
     return (
       <View style={Styles.container}>
-        <Text style={Styles.authTitle}>Relay</Text>
+        <Text style={Styles.authTitle}>RELAY</Text>
         <Image
           style={Styles.appLogo}
           source={require('../../images/latest-logo.png')}
@@ -47,7 +47,8 @@ const Styles = {
   authTitle: {
     marginBottom: 10,
     fontSize: 40,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    fontFamily: 'monospace'
   },
   appLogo: {
     marginBottom: 10,
