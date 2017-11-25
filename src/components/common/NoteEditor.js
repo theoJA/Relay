@@ -34,7 +34,8 @@ export default class NoteEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isModalVisible: false,
+      linkModalVisible: false,
+      editModalVisible: false,
       buttonStates: initialButtonStates,
       activeTextStyle: 'normal',
       data: null,
@@ -46,16 +47,23 @@ export default class NoteEditor extends Component {
         styleArr: [],
       },
       tagsArr: []
-    }
-  }
+    };
+  };
 
-  _showModal() {
-    this.setState({isModalVisible: true});
-  }
+  _showLinkModal() {
+    this.setState({linkModalVisible: true});
+  };
+  _hideLinkModal() {
+    this.setState({linkModalVisible: false});
+  };
 
-  _hideModal() {
-    this.setState({isModalVisible: false});
-  }
+  _showEditModal() {
+    this.setState({editModalVisible: true});
+  };
+  _hideEditModal() {
+    this.setState({editModalVisible: false});
+  };
+
 
   _insertImage = async () => {
     let { data, editorState } = this.state; 
@@ -148,7 +156,7 @@ export default class NoteEditor extends Component {
     }
   }
 
-  _displayKey() {
+  _displayId() {
     //alert(this.id.split(',')[0]);
     alert(this.id);
   }
@@ -165,7 +173,12 @@ export default class NoteEditor extends Component {
             <TouchableOpacity 
               key={`${type},${editorStateObj.dataArr[index]},${index}`}
               id={`${type},${editorStateObj.dataArr[index]},${index}`}
-              onPress={this._displayKey}
+              state={this.state}
+              onPress={
+                  //this._showEditModal();
+                  this._displayId
+                
+              }
             >
               <Text style={editorStateObj.styleArr[index]}>
                 {`${editorStateObj.dataArr[index]}\n\n`}
@@ -180,7 +193,7 @@ export default class NoteEditor extends Component {
             <TouchableOpacity 
               key={`${type},${editorStateObj.dataArr[index]},${index}`}
               id={`${type},${editorStateObj.dataArr[index]},${index}`}
-              onPress={this._displayKey}
+              onPress={this._showEditModal.bind(this)}
             >
               <Image
                 source={{ uri: editorStateObj.dataArr[index] }}
@@ -196,7 +209,7 @@ export default class NoteEditor extends Component {
             <TouchableOpacity 
               key={`${type},${editorStateObj.dataArr[index]},${index}`}
               id={`${type},${editorStateObj.dataArr[index]},${index}`}
-              onPress={this._displayKey}
+              onPress={this._showEditModal.bind(this)}
             >
               <Text style={editorStateObj.styleArr[index]}>
                 {`${editorStateObj.dataArr[index]}\n\n`}
@@ -295,7 +308,7 @@ export default class NoteEditor extends Component {
           <TouchableOpacity onPress={this._insertImage}>
             <Text style={Styles.editorButtons}>+ Image</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={this._showModal.bind(this)}>
+          <TouchableOpacity onPress={this._showLinkModal.bind(this)}>
             <Text style={Styles.editorButtons}>+ Link</Text>
           </TouchableOpacity>
         </View>
@@ -315,7 +328,7 @@ export default class NoteEditor extends Component {
           )}
         </ScrollView>
 
-        <Modal isVisible={this.state.isModalVisible}>
+        <Modal isVisible={this.state.linkModalVisible}>
           <View style={Styles.modalContainer}>
             
             <Text style={Styles.textInputTitleStyle}>
@@ -331,8 +344,8 @@ export default class NoteEditor extends Component {
             />
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
-              <TouchableOpacity onPress={this._hideModal.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#EF9A9A" }]}>Back</Text>
+              <TouchableOpacity onPress={this._hideLinkModal.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: '#AED6F1' }]}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={this._insertLink.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Add</Text>
@@ -340,6 +353,28 @@ export default class NoteEditor extends Component {
             </View>
           </View>
         </Modal>
+
+        <Modal isVisible={this.state.editModalVisible}>
+          <View style={Styles.modalContainer}>
+            
+            <Text style={Styles.textInputTitleStyle}>
+              Select an option:
+            </Text>
+
+            <View style={{flexDirection: 'row', marginTop: 20}}>
+              <TouchableOpacity onPress={this._hideEditModal.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#AED6F1" }]}>Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this._insertLink.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this._insertLink.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#EF9A9A" }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
       </View>
     );
   };
