@@ -88,13 +88,13 @@ export default class CreateNote extends Component {
               value={this.state.title}
               />
               <TouchableOpacity onPress={() => {}} style={{ flex: 5 }}>
-                <Text style={[Styles.modalButton, { borderColor: '#000', borderRadius: 5, borderWidth: 1, }]}>Add Tag</Text>
+                <Text style={[Styles.modalButton, { borderColor: '#000', backgroundColor: '#ddd', borderRadius: 5, borderWidth: 1, }]}>Add Tag</Text>
               </TouchableOpacity>
             </View>
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
               <TouchableOpacity onPress={this._hideModal.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#EF9A9A" }]}>Back</Text>
+                <Text style={[Styles.modalButton, { backgroundColor: '#AED6F1' }]}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {this.props.navigation.goBack()}}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Publish</Text>
