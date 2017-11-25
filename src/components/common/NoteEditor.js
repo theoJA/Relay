@@ -158,7 +158,8 @@ export default class NoteEditor extends Component {
 
   _displayId() {
     //alert(this.id.split(',')[0]);
-    alert(this.id);
+    alert(this.that.state.editorState.typeArr);
+    this.that._showEditModal();
   }
 
   _dataRenderer(editorStateObj) {
@@ -173,7 +174,7 @@ export default class NoteEditor extends Component {
             <TouchableOpacity 
               key={`${type},${editorStateObj.dataArr[index]},${index}`}
               id={`${type},${editorStateObj.dataArr[index]},${index}`}
-              state={this.state}
+              that={this}
               onPress={
                   //this._showEditModal();
                   this._displayId
