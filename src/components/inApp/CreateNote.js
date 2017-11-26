@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Button } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
-import NoteEditor from '../common/NoteEditor'
+import NoteEditor from '../richTextEditor/NoteEditor'
 
 export default class CreateNote extends Component {
 
