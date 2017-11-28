@@ -50,7 +50,6 @@ export default class SignInEmail extends Component {
   }
 
   signUpUser = () => {
-    alert('signing in');
     this.props.navigation.dispatch(this.changeToAppNavStack);
   }
 
