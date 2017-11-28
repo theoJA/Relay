@@ -69,6 +69,7 @@ export default class NoteEditor extends Component {
     this.setState({linkModalVisible: true});
   };
   _hideLinkModal() {
+     
     this.setState({linkModalVisible: false});
   };
 
@@ -84,20 +85,28 @@ export default class NoteEditor extends Component {
 // --- Data Insertion functions ---
 
   _insertImage = async () => {
-    let { data, editorState } = this.state; 
+    let { data, editorState, selectedParag, editingStatus } = this.state; 
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       //aspect: [16, 11],
     });
     if (!result.cancelled) {
 
-      editorState.typeArr.push('image');
-      let tempTypeArr = editorState.typeArr;
-      
-      editorState.dataArr.push(result.uri);
-      let tempDataArr = editorState.dataArr;
 
-      editorState.styleArr.push({});
+      if (editingStatus.editing) {
+        editorState.typeArr[selectedParag.index] = 'image';
+        editorState.dataArr[selectedParag.index] = result.uri;
+        editorState.styleArr[selectedParag.index] = {};
+      }
+
+      else {
+        editorState.typeArr.push('image');
+        editorState.dataArr.push(result.uri);
+        editorState.styleArr.push({});
+      }
+      
+      let tempTypeArr = editorState.typeArr;
+      let tempDataArr = editorState.dataArr;
       let tempStyleArr = editorState.styleArr;
 
       this.setState({
@@ -108,6 +117,10 @@ export default class NoteEditor extends Component {
         },
         textInputValue: null,
         data: null,
+        editingStatus: {
+          editing: false,
+          editingInstructions: "",
+        },
       });
     }
     this._dataRenderer(editorState);
@@ -157,30 +170,40 @@ export default class NoteEditor extends Component {
   }
 
   _insertLink() {
-    let { linkInputValue, editorState, textInputValue } = this.state; 
-    
+    let { data, linkInputValue, editorState, textInputValue, selectedParag, editingStatus } = this.state; 
     if (!linkInputValue) {
       return;
     }
 
     else {
-      editorState.typeArr.push('link');
-      let tempTypeArr = editorState.typeArr;
-      
-      editorState.dataArr.push(linkInputValue);
-      let tempDataArr = editorState.dataArr;
 
-      editorState.styleArr.push(textStyles.link);
+      if (editingStatus.editing) {
+        editorState.typeArr[selectedParag.index] = 'link';
+        editorState.dataArr[selectedParag.index] = linkInputValue;
+        editorState.styleArr[selectedParag.index] = textStyles.link;
+      } else {
+        editorState.typeArr.push('link');
+        editorState.dataArr.push(linkInputValue);
+        editorState.styleArr.push(textStyles.link);
+      }
+
+      let tempTypeArr = editorState.typeArr;
+      let tempDataArr = editorState.dataArr;
       let tempStyleArr = editorState.styleArr;
-  
+      
       this.setState({
         editorState: {
           typeArr: tempTypeArr,
           dataArr: tempDataArr,
           styleArr: tempStyleArr,
         },
+        data: null,
         linkInputValue: null,
         textInputValue: null,
+        editingStatus: {
+          editing: false,
+          editingInstructions: "",
+        },
       })
   
       this._dataRenderer(editorState);
