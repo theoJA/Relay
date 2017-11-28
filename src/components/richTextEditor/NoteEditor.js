@@ -69,7 +69,6 @@ export default class NoteEditor extends Component {
     this.setState({linkModalVisible: true});
   };
   _hideLinkModal() {
-     
     this.setState({linkModalVisible: false});
   };
 
@@ -79,10 +78,57 @@ export default class NoteEditor extends Component {
   _hideEditModal() {
     this.setState({editModalVisible: false});
   };
-
 // --------------------------
+  
 
 // --- Data Insertion functions ---
+  
+  _insertText() {
+    let { data, editorState, textInputValue, buttonStates, activeTextStyle, editingStatus, selectedParag } = this.state; 
+  
+    if (!data) {
+      return;
+    }
+  
+    else {
+  
+      if (editingStatus.editing) {
+        editorState.typeArr[selectedParag.index] = 'text';
+        editorState.dataArr[selectedParag.index] = data;
+        editorState.styleArr[selectedParag.index] = textStyles[activeTextStyle];
+      }
+      else {
+        editorState.typeArr.push('text');
+        editorState.dataArr.push(data);
+        editorState.styleArr.push(textStyles[activeTextStyle]);
+      }
+      
+      let tempTypeArr = editorState.typeArr;
+      let tempDataArr = editorState.dataArr;
+      let tempStyleArr = editorState.styleArr;
+  
+      this.setState({
+        editorState: {
+          typeArr: tempTypeArr,
+          dataArr: tempDataArr,
+          styleArr: tempStyleArr,
+        },
+        textInputValue: null,
+        data: null,
+        editingStatus: {
+          editing: false,
+          editingInstructions: "",
+        },
+        selectedParag: {
+          type: null,
+          index: null,
+        },
+      })
+  
+      this._dataRenderer(editorState);
+    }
+  
+  }
 
   _insertImage = async () => {
     let { data, editorState, selectedParag, editingStatus } = this.state; 
@@ -121,53 +167,14 @@ export default class NoteEditor extends Component {
           editing: false,
           editingInstructions: "",
         },
+        selectedParag: {
+          type: null,
+          index: null,
+        },
       });
     }
     this._dataRenderer(editorState);
   };
-
-  _insertText() {
-    let { data, editorState, textInputValue, buttonStates, activeTextStyle, editingStatus, selectedParag } = this.state; 
-
-    if (!data) {
-      return;
-    }
-
-    else {
-
-      if (editingStatus.editing) {
-        editorState.typeArr[selectedParag.index] = 'text';
-        editorState.dataArr[selectedParag.index] = data;
-        editorState.styleArr[selectedParag.index] = textStyles[activeTextStyle];
-      }
-      else {
-        editorState.typeArr.push('text');
-        editorState.dataArr.push(data);
-        editorState.styleArr.push(textStyles[activeTextStyle]);
-      }
-      
-      let tempTypeArr = editorState.typeArr;
-      let tempDataArr = editorState.dataArr;
-      let tempStyleArr = editorState.styleArr;
-  
-      this.setState({
-        editorState: {
-          typeArr: tempTypeArr,
-          dataArr: tempDataArr,
-          styleArr: tempStyleArr,
-        },
-        textInputValue: null,
-        data: null,
-        editingStatus: {
-          editing: false,
-          editingInstructions: "",
-        },
-      })
-  
-      this._dataRenderer(editorState);
-    }
-
-  }
 
   _insertLink() {
     let { data, linkInputValue, editorState, textInputValue, selectedParag, editingStatus } = this.state; 
@@ -204,13 +211,17 @@ export default class NoteEditor extends Component {
           editing: false,
           editingInstructions: "",
         },
+        selectedParag: {
+          type: null,
+          index: null,
+        },
       })
   
       this._dataRenderer(editorState);
     }
   }
-
 // --------------------------------
+
 
 // ---- Editing paragraph functions ----
   _setSelectedParag() {
@@ -234,11 +245,53 @@ export default class NoteEditor extends Component {
     this.setState({
       editingStatus: {
         editing: true,
-        editingInstructions: `Editing paragraph ${parseInt(selectedParag.index) + 1}. Insert text, image, or link.`
+        editingInstructions: `Insert new text, image, or link.`
       },
       textInputValue: tempTextInputValue,
       data: tempTextInputValue,
     });
+  }
+
+  _cancelEditing() {
+    let { data, textInputValue, linkInputValue, editorState, selectedParag } = this.state;
+  
+    this.setState({
+      selectedParag: {
+        type: null,
+        index: null,
+      },
+      editingStatus: {
+        editing: false,
+        editingInstructions: ""
+      },
+      data: null,
+      textInputValue: null,
+      linkInputValue: null
+    })
+  }
+
+  _deleteParag() {
+    let { editorState, selectedParag } = this.state;
+    editorState.typeArr[selectedParag.index] = null;
+    editorState.dataArr[selectedParag.index] = null;
+    editorState.styleArr[selectedParag.index] = null;
+    let tempTypeArr = editorState.typeArr;
+    let tempDataArr = editorState.dataArr;
+    let tempStyleArr = editorState.styleArr;
+
+    this.setState({
+      selectedParag: {
+        type: null,
+        index: null,
+      },
+      editorState: {
+        typeArr: tempTypeArr,
+        dataArr: tempDataArr,
+        styleArr: tempStyleArr,
+      }
+    })
+    this._hideEditModal();
+    this._dataRenderer(editorState);
   }
 // ---------------------------------------
 
@@ -307,6 +360,8 @@ export default class NoteEditor extends Component {
 
     this.setState({ tagsArr: tempTagsArr });
   };
+// ---------------------------
+
 
 // --- Text Style functions ---
   _styleOutput() {
@@ -340,16 +395,35 @@ export default class NoteEditor extends Component {
     }
     this.forceUpdate();
   };
-
 // ---------------------------
+
 
 // ---- helper functions -----
   _editingInstructions() {
-    return (
-      <Text>
-        {this.state.editingStatus.editingInstructions}
-      </Text>
-    )
+    let { editingStatus } = this.state; 
+
+    if (editingStatus.editingInstructions === "") {
+      return 
+    } else {
+      return (
+        <View style={{ flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: "#ccc" }}>
+          <Text style={{ flex: 7, textAlign: 'center', paddingTop: 15, backgroundColor: '#C5E1A5', fontWeight: 'bold' }}>
+            {editingStatus.editingInstructions}
+          </Text>
+          <TouchableOpacity 
+            style={{ flex: 3, backgroundColor: '#C5E1A5' }}
+            onPress={this._cancelEditing.bind(this)}
+          >
+            <Text
+            style={[Styles.modalButton, { padding: 3, backgroundColor: "#ECEFF1" }]}
+            >
+              Cancel edit
+            </Text>            
+          </TouchableOpacity>
+        </View>
+
+      )
+    }
   }
 // -----------------------
 
@@ -456,7 +530,7 @@ export default class NoteEditor extends Component {
           <View style={Styles.modalContainer}>
             
             <Text style={Styles.textInputTitleStyle}>
-              {this.state.selectedParag.index}
+              Select an option
             </Text>
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
@@ -466,7 +540,7 @@ export default class NoteEditor extends Component {
               <TouchableOpacity onPress={this._startEditing.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Edit</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={this._insertLink.bind(this)}>
+              <TouchableOpacity onPress={this._deleteParag.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#EF9A9A" }]}>Delete</Text>
               </TouchableOpacity>
             </View>
