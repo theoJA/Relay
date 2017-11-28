@@ -5,7 +5,8 @@ import {
   TextInput, 
   TouchableOpacity, 
   KeyboardAvoidingView,
-  Keyboard
+  Keyboard,
+  ToastAndroid
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationActions } from 'react-navigation';
@@ -61,8 +62,8 @@ export default class RegisterEmail extends Component {
   }
   
   registerUser = () => {
-    alert('Registration success!');
     Keyboard.dismiss;
+    ToastAndroid.show('Registration success!', ToastAndroid.LONG);
     this.props.navigation.dispatch(this.resetNavStack);
     // this is where we will send the user data to firebase for registration
     // if there is no error then we return true, which will allow header button to navigate to signing in
