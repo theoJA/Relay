@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { 
   StyleSheet, Image, View, Button, Text, TouchableOpacity, 
-  TextInput, ScrollView, Dimensions } from "react-native";
+  TextInput, ScrollView, Dimensions, ToastAndroid } from "react-native";
 import Modal from 'react-native-modal';
 import { Ionicons, Entypo, MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
 import { ImagePicker } from 'expo';
@@ -16,7 +16,7 @@ const textStyles = {
   normal: { fontSize: 15, fontWeight: 'normal', fontStyle: 'normal'},
   H1: { fontSize: 25, fontWeight: 'bold', fontStyle: 'normal'},
   H2: { fontSize: 20, fontWeight: 'bold', fontStyle: 'normal'},
-  script: { fontSize: 15, backgroundColor: '#AED6F1', fontWeight: 'normal', fontStyle: 'normal' },
+  script: { fontSize: 15, backgroundColor: '#AED6F1', fontWeight: 'normal', fontStyle: 'normal', marginBottom: 10 },
   quote: { fontSize: 17, fontStyle: 'italic', fontWeight: 'normal', paddingLeft: 20, paddingRight: 20, paddingTop: 5, paddingBottom: 5 },
   link: { fontSize: 17, textDecorationLine: 'underline' },
 };
@@ -59,7 +59,12 @@ export default class NoteEditor extends Component {
       editingStatus: {
         editing: false,
         editingInstructions: "",
-      } 
+      },
+      insertBetween: {
+        inserting: false,
+        insertingInstructions: "",
+        index: null 
+      }
     };
   };
 
@@ -84,7 +89,7 @@ export default class NoteEditor extends Component {
 // --- Data Insertion functions ---
   
   _insertText() {
-    let { data, editorState, textInputValue, buttonStates, activeTextStyle, editingStatus, selectedParag } = this.state; 
+    let { data, editorState, textInputValue, buttonStates, activeTextStyle, editingStatus, selectedParag, insertBetween } = this.state; 
   
     if (!data) {
       return;
@@ -96,6 +101,11 @@ export default class NoteEditor extends Component {
         editorState.typeArr[selectedParag.index] = 'text';
         editorState.dataArr[selectedParag.index] = data;
         editorState.styleArr[selectedParag.index] = textStyles[activeTextStyle];
+      }
+      else if (insertBetween.inserting) {
+        editorState.typeArr.splice(insertBetween.index, 0, 'text');
+        editorState.dataArr.splice(insertBetween.index, 0, data);
+        editorState.styleArr.splice(insertBetween.index, 0, textStyles[activeTextStyle]);
       }
       else {
         editorState.typeArr.push('text');
@@ -123,6 +133,11 @@ export default class NoteEditor extends Component {
           type: null,
           index: null,
         },
+        insertBetween: {
+          inserting: false,
+          insertingInstructions: "",
+          index: null 
+        }
       })
   
       this._dataRenderer(editorState);
@@ -131,7 +146,7 @@ export default class NoteEditor extends Component {
   }
 
   _insertImage = async () => {
-    let { data, editorState, selectedParag, editingStatus } = this.state; 
+    let { data, editorState, selectedParag, editingStatus, insertBetween } = this.state; 
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       //aspect: [16, 11],
@@ -144,7 +159,11 @@ export default class NoteEditor extends Component {
         editorState.dataArr[selectedParag.index] = result.uri;
         editorState.styleArr[selectedParag.index] = {};
       }
-
+      else if (insertBetween.inserting) {
+        editorState.typeArr.splice(insertBetween.index, 0, 'image');
+        editorState.dataArr.splice(insertBetween.index, 0, result.uri);
+        editorState.styleArr.splice(insertBetween.index, 0, {});
+      }
       else {
         editorState.typeArr.push('image');
         editorState.dataArr.push(result.uri);
@@ -171,13 +190,18 @@ export default class NoteEditor extends Component {
           type: null,
           index: null,
         },
+        insertBetween: {
+          inserting: false,
+          insertingInstructions: "",
+          index: null 
+        }
       });
     }
     this._dataRenderer(editorState);
   };
 
   _insertLink() {
-    let { data, linkInputValue, editorState, textInputValue, selectedParag, editingStatus } = this.state; 
+    let { data, linkInputValue, editorState, textInputValue, selectedParag, editingStatus, insertBetween } = this.state; 
     if (!linkInputValue) {
       return;
     }
@@ -188,7 +212,13 @@ export default class NoteEditor extends Component {
         editorState.typeArr[selectedParag.index] = 'link';
         editorState.dataArr[selectedParag.index] = linkInputValue;
         editorState.styleArr[selectedParag.index] = textStyles.link;
-      } else {
+      } 
+      else if (insertBetween.inserting) {
+        editorState.typeArr.splice(insertBetween.index, 0, 'link');
+        editorState.dataArr.splice(insertBetween.index, 0, linkInputValue);
+        editorState.styleArr.splice(insertBetween.index, 0, textStyles.link);
+      }
+      else {
         editorState.typeArr.push('link');
         editorState.dataArr.push(linkInputValue);
         editorState.styleArr.push(textStyles.link);
@@ -215,10 +245,41 @@ export default class NoteEditor extends Component {
           type: null,
           index: null,
         },
+        insertBetween: {
+          inserting: false,
+          insertingInstructions: "",
+          index: null 
+        }
       })
   
       this._dataRenderer(editorState);
     }
+  }
+
+  _insertAbove() {
+    let { selectedParag } = this.state;
+    let tempIndex = selectedParag.index;
+    this._hideEditModal();
+    this.setState({
+      insertBetween: {
+        inserting: true,
+        insertingInstructions: 'Insert ABOVE selected paragraph',
+        index: tempIndex
+      }
+    })
+  }
+
+  _insertBelow() {
+    let { selectedParag } = this.state;
+    let tempIndex = parseInt(selectedParag.index) + 1;
+    this._hideEditModal();
+    this.setState({
+      insertBetween: {
+        inserting: true,
+        insertingInstructions: 'Insert BELOW selected paragraph',
+        index: tempIndex
+      }
+    })
   }
 // --------------------------------
 
@@ -264,6 +325,11 @@ export default class NoteEditor extends Component {
         editing: false,
         editingInstructions: ""
       },
+      insertBetween: {
+        inserting: false,
+        insertingInstructions: "",
+        index: null 
+      },
       data: null,
       textInputValue: null,
       linkInputValue: null
@@ -272,9 +338,9 @@ export default class NoteEditor extends Component {
 
   _deleteParag() {
     let { editorState, selectedParag } = this.state;
-    editorState.typeArr[selectedParag.index] = null;
-    editorState.dataArr[selectedParag.index] = null;
-    editorState.styleArr[selectedParag.index] = null;
+    editorState.typeArr.splice(selectedParag.index, 1);
+    editorState.dataArr.splice(selectedParag.index, 1);
+    editorState.styleArr.splice(selectedParag.index, 1);
     let tempTypeArr = editorState.typeArr;
     let tempDataArr = editorState.dataArr;
     let tempStyleArr = editorState.styleArr;
@@ -400,15 +466,12 @@ export default class NoteEditor extends Component {
 
 // ---- helper functions -----
   _editingInstructions() {
-    let { editingStatus } = this.state; 
-
-    if (editingStatus.editingInstructions === "") {
-      return 
-    } else {
+    let { editingStatus, insertBetween } = this.state; 
+    if (editingStatus.editing || insertBetween.inserting) {
       return (
         <View style={{ flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: "#ccc" }}>
           <Text style={{ flex: 7, textAlign: 'center', paddingTop: 15, backgroundColor: '#C5E1A5', fontWeight: 'bold' }}>
-            {editingStatus.editingInstructions}
+            {editingStatus.editing ? editingStatus.editingInstructions : insertBetween.inserting ? insertBetween.insertingInstructions : null}
           </Text>
           <TouchableOpacity 
             style={{ flex: 3, backgroundColor: '#C5E1A5' }}
@@ -417,11 +480,10 @@ export default class NoteEditor extends Component {
             <Text
             style={[Styles.modalButton, { padding: 3, backgroundColor: "#ECEFF1" }]}
             >
-              Cancel edit
+              Cancel
             </Text>            
           </TouchableOpacity>
         </View>
-
       )
     }
   }
@@ -530,7 +592,7 @@ export default class NoteEditor extends Component {
           <View style={Styles.modalContainer}>
             
             <Text style={Styles.textInputTitleStyle}>
-              Select an option
+              {`Select an option for parag ${this.state.selectedParag.index}`}
             </Text>
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
@@ -540,8 +602,24 @@ export default class NoteEditor extends Component {
               <TouchableOpacity onPress={this._startEditing.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Edit</Text>
               </TouchableOpacity>
+
+              
+
               <TouchableOpacity onPress={this._deleteParag.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#EF9A9A" }]}>Delete</Text>
+              </TouchableOpacity>
+
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <TouchableOpacity onPress={this._insertAbove.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#ddd" }]}>Insert 
+                  <Entypo style={[Styles.editorButtons, {backgroundColor: '#ddd', margin: 20 }]} name="arrow-up" size={20} color="black" />
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this._insertBelow.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#ddd" }]}>Insert 
+                  <Entypo style={[Styles.editorButtons, {backgroundColor: '#ddd'}]} name="arrow-down" size={20} color="black" />
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
