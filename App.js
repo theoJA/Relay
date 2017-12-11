@@ -7,6 +7,8 @@ import reducers from "./src/reducers";
 import { StyleSheet, Text, View } from 'react-native';
 import { RootNav } from './src/components/navigation/RootNav';
 
+const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
+
 export default class App extends Component {
   
   componentWillMount() {
@@ -22,7 +24,6 @@ export default class App extends Component {
   }
 
   render() {
-    const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
 
     return (
       <Provider store={store}>
