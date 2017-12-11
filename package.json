@@ -27,6 +27,9 @@
     "react-native-draftjs-render": "^2.3.0",
     "react-native-draftjs-renderer": "^1.1.1",
     "react-native-modal": "^4.1.1",
-    "react-navigation": "^1.0.0-beta.14"
+    "react-navigation": "^1.0.0-beta.14",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0"
   }
 }
