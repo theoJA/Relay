@@ -1,10 +1,25 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
-import { DrawerItems } from "react-navigation";
+import { DrawerItems, NavigationActions } from "react-navigation";
 import { EvilIcons } from '@expo/vector-icons';
+import * as actions from '../../actions';
 
 
-export default class DrawerContent extends Component {
+class DrawerContent extends Component {
+
+  logoutResetNavStack = NavigationActions.reset({
+    index: 0,
+    actions: [
+      NavigationActions.navigate({routeName: 'Logout'}),
+    ]
+  });
+
+  logoutFromRelay() {
+    this.props.logoutRelay();
+    this.props.navigation.dispatch(this.logoutResetNavStack);
+  }
+
   render() {
     return <View style={Styles.container}>
         <View style={Styles.userIconContainer}>
@@ -19,7 +34,9 @@ export default class DrawerContent extends Component {
         <DrawerItems {...this.props} />
 
         <View style={Styles.logOutContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.logoutFromRelay.bind(this)}
+          >
             <Text style={Styles.logOutStyle}>Logout</Text>
           </TouchableOpacity>
         </View>
@@ -78,3 +95,5 @@ const Styles = StyleSheet.create({
     fontWeight: 'bold',
   }
 });
+
+export default connect(null, actions)(DrawerContent);
