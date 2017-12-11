@@ -4,7 +4,8 @@ import {
   PASSWORD_CHANGED,
   SIGN_IN_EMAIL,
   SIGN_IN_EMAIL_SUCCESS,
-  SIGN_IN_EMAIL_FAIL
+  SIGN_IN_EMAIL_FAIL,
+  LOGOUT
 } from './types';
 
 export const emailChanged = (text) => {
@@ -47,3 +48,14 @@ const signInEmailFail = (dispatch) => {
     type: SIGN_IN_EMAIL_FAIL
   });
 };
+
+export const logoutRelay = () => {
+  return (dispatch) => {
+    firebase.auth().signOut()
+      .then(() => {
+        dispatch({
+          type: LOGOUT
+        });
+      });
+  }
+}
