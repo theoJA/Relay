@@ -16,12 +16,10 @@ import * as actions from '../../actions';
 class RegisterEmail extends Component {
 
   // resets the navigation stack to prevent cyclical navigation
-  resetNavStack = NavigationActions.reset({
-    index: 2,
+  changeToAppNavStack = NavigationActions.reset({
+    index: 0,
     actions: [
-      NavigationActions.navigate({routeName: 'Logo'}),
-      NavigationActions.navigate({routeName: 'SignIn'}),
-      NavigationActions.navigate({routeName: 'SignInEmail'}),
+      NavigationActions.navigate({routeName: 'Drawer'}),
     ]
   });
 
@@ -62,14 +60,16 @@ class RegisterEmail extends Component {
     this.props.passwordChanged(text);
   }
 
-  // registerUser action goes here
-  registerEmail = () => {
+  registerEmail = async () => {
+    const { email, password } = this.props;
+    
     Keyboard.dismiss;
-    ToastAndroid.show('Registration success!', ToastAndroid.LONG);
-    this.props.navigation.dispatch(this.resetNavStack);
-    // this is where we will send the user data to firebase for registration
-    // if there is no error then we return true, which will allow header button to navigate to signing in
-    // if there is an error, we return the error message and print it out
+    await this.props.signInEmail({ email, password });
+    
+    if (this.props.error === '') {
+      ToastAndroid.show('Welcome to Relay!', ToastAndroid.LONG);
+      this.props.navigation.dispatch(this.changeToAppNavStack);
+    }
   }
 
   render() {
