@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
 import { 
   View, 
   Text, 
   TextInput, 
   TouchableOpacity, 
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Keyboard,
+  ToastAndroid
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationActions } from 'react-navigation';
+import * as actions from '../../actions';
 
-export default class SignInEmail extends Component {
+class SignInEmail extends Component {
   
   // resets the navigation stack to go to another parent stack nav
   // --> NEEDS FIXING!!!!!!
@@ -46,11 +50,27 @@ export default class SignInEmail extends Component {
   };
 
   componentDidMount() {
-    this.props.navigation.setParams({ signUp: this.signUpUser });
+    this.props.navigation.setParams({ signUp: this.signInEmail });
   }
 
-  signUpUser = () => {
-    this.props.navigation.dispatch(this.changeToAppNavStack);
+  onEmailChange(text) {
+    this.props.emailChanged(text);
+  }
+
+  onPasswordChange(text) {
+    this.props.passwordChanged(text);
+  }
+
+  signInEmail = async () => {
+    const { email, password } = this.props;
+    
+    Keyboard.dismiss;
+    await this.props.signInEmail({ email, password });
+    
+    if (this.props.error === '') {
+      ToastAndroid.show('Welcome back!', ToastAndroid.LONG);
+      this.props.navigation.dispatch(this.changeToAppNavStack);
+    }
   }
 
   render() {
@@ -65,18 +85,26 @@ export default class SignInEmail extends Component {
             EMAIL
           </Text>
           <TextInput 
+          placeholder="email@email.com" 
           style={Styles.textInputStyle}
-          onChangeText={(text) => this.setState({ email: text })} 
+          onChangeText={this.onEmailChange.bind(this)} 
+          value={this.props.email}
           />
 
           <Text style={Styles.textInputTitleStyle}>
             PASSWORD
           </Text>
           <TextInput 
+          placeholder="aStrongPassword"
           style={Styles.textInputStyle} 
           secureTextEntry={true}
-          onChangeText={(text) => this.setState({ password: text })} 
+          onChangeText={this.onPasswordChange.bind(this)} 
+          value={this.props.password} 
           />
+
+          <Text style={Styles.errorTextStyle}>
+            {this.props.error}
+          </Text>
 
         </View>
       </KeyboardAvoidingView>
@@ -97,6 +125,11 @@ const Styles = {
     margin: 30,
     marginTop: 20
   },
+  errorTextStyle: {
+    fontSize: 20,
+    alignSelf: 'center',
+    color: 'red'
+  },
   textInputTitleStyle: {
     color: "#566573",
     fontSize: 15,
@@ -108,3 +141,10 @@ const Styles = {
     fontSize: 18
   }
 }
+
+const mapStateToProps = ({ auth }) => {
+  const { email, password, error, loading } = auth;
+  return { email, password, error, loading };
+};
+
+export default connect(mapStateToProps, actions)(SignInEmail);
