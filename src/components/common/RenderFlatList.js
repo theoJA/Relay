@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList } from "react-native";
 import { CardSection } from '../common';
-import { AddRemoveButton } from '../common/AddRemoveButton';
+import AddRemoveButton from '../common/AddRemoveButton';
 
 export class RenderFlatList extends React.Component {
 
