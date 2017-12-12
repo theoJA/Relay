@@ -1,12 +1,19 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+import firebase from "firebase";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { DrawerItems, NavigationActions } from "react-navigation";
 import { EvilIcons } from '@expo/vector-icons';
 import * as actions from '../../actions';
 
-
 class DrawerContent extends Component {
+
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {
+  //     username: null
+  //   }
+  // }
 
   logoutResetNavStack = NavigationActions.reset({
     index: 0,
@@ -16,8 +23,14 @@ class DrawerContent extends Component {
   });
 
   logoutFromRelay() {
-    this.props.logoutRelay();
-    this.props.navigation.dispatch(this.logoutResetNavStack);
+    console.log(firebase.User.email);
+
+    firebase.auth().signOut();
+
+    console.log(firebase.User);
+
+    // this.props.logoutRelay();
+    // this.props.navigation.dispatch(this.logoutResetNavStack);
   }
 
   render() {
@@ -27,7 +40,7 @@ class DrawerContent extends Component {
             <EvilIcons name="user" size={150} color="black" />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text>Theo JA</Text>
+            <Text>{this.props.username}</Text>
           </TouchableOpacity>
         </View>
 
@@ -96,4 +109,11 @@ const Styles = StyleSheet.create({
   }
 });
 
-export default connect(null, actions)(DrawerContent);
+const mapStateToProps = (state) => {
+  return {
+    interests: state.inApp.interests,
+    username: state.inApp.username
+  };
+}
+
+export default connect(mapStateToProps, actions)(DrawerContent);
