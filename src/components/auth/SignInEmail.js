@@ -62,10 +62,10 @@ class SignInEmail extends Component {
   }
 
   signInEmail = async () => {
-    const { email, password } = this.props;
+    const { email, password, interests } = this.props;
     
     Keyboard.dismiss;
-    await this.props.signInEmail({ email, password });
+    await this.props.signInEmail({ email, password, interests });
     
     if (this.props.error === '') {
       ToastAndroid.show('Welcome back!', ToastAndroid.LONG);
@@ -143,8 +143,8 @@ const Styles = {
 }
 
 const mapStateToProps = ({ auth }) => {
-  const { email, password, error, loading } = auth;
-  return { email, password, error, loading };
+  const { interests, email, password, error, loading } = auth;
+  return { interests, email, password, error, loading };
 };
 
 export default connect(mapStateToProps, actions)(SignInEmail);
