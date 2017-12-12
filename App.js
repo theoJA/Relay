@@ -11,6 +11,11 @@ const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
 
 export default class App extends Component {
   
+  constructor(props) {
+    super(props);
+    console.ignoredYellowBox = ['Setting a timer'];
+  }
+
   componentWillMount() {
     const config = {
       apiKey: "AIzaSyD9kmetCBxIiOvoyILTosAtKDyhVEB1_J0",
