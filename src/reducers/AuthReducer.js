@@ -1,10 +1,13 @@
 import {
+  INTEREST_ADDED,
+  INTEREST_REMOVED,
   EMAIL_CHANGED, 
   PASSWORD_CHANGED,
   SIGN_IN_EMAIL,
   SIGN_IN_EMAIL_SUCCESS,
   SIGN_IN_EMAIL_FAIL,
-  LOGOUT
+  LOGOUT,
+  LOGOUT_ERROR
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -19,6 +22,19 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch(action.type) {
     
+    case INTEREST_ADDED: {
+      return { 
+        ...state, 
+        interests: [...state.interests, action.payload] 
+      }
+    }
+
+    case INTEREST_REMOVED: {
+      let interestIndex = state.interests.indexOf(action.payload);
+      state.interests.splice(interestIndex, 1);
+      return { ...state }
+    }
+
     case EMAIL_CHANGED:
       return { ...state, email: action.payload}
 
@@ -40,9 +56,12 @@ export default (state = INITIAL_STATE, action) => {
       }
 
     case LOGOUT:
+      return INITIAL_STATE;
+
+    case LOGOUT_ERROR:
       return {
         ...state,
-        ...INITIAL_STATE,
+        error: action.payload
       }
 
     default:

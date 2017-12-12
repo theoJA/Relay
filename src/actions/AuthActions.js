@@ -1,12 +1,29 @@
 import firebase from 'firebase';
 import {
+  INTEREST_ADDED,
+  INTEREST_REMOVED,
   EMAIL_CHANGED, 
   PASSWORD_CHANGED,
   SIGN_IN_EMAIL,
   SIGN_IN_EMAIL_SUCCESS,
   SIGN_IN_EMAIL_FAIL,
-  LOGOUT
+  LOGOUT,
+  LOGOUT_ERROR
 } from './types';
+
+export const interestAdded = (interest) => {
+  return {
+    type: INTEREST_ADDED,
+    payload: interest
+  }
+}
+
+export const interestRemoved = (interest) => {
+  return {
+    type: INTEREST_REMOVED,
+    payload: interest
+  }
+}
 
 export const emailChanged = (text) => {
   return {
@@ -22,7 +39,9 @@ export const passwordChanged = (text) => {
   };
 };
 
-export const signInEmail = ({ email, password }) => {
+export const signInEmail = ({ email, password, interests }) => {
+  let tempUserName = email.split('@')[0];
+
   return (dispatch) => {
     dispatch({ type: SIGN_IN_EMAIL })
 
@@ -30,7 +49,13 @@ export const signInEmail = ({ email, password }) => {
       .then(user => signInEmailSuccess(dispatch, user))
       .catch((error) => {
         firebase.auth().createUserWithEmailAndPassword(email, password)
-          .then(user => signInEmailSuccess(dispatch, user))
+          .then(user => {
+            // send a profile object to the user here
+            // add interests, default username, etc
+            firebase.database().ref(`/users/${user.uid}/profile`)
+              .push({ interests, username: tempUserName });
+            signInEmailSuccess(dispatch, user);
+          })
           .catch(() => signInEmailFail(dispatch));
       });
   };
