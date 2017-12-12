@@ -1,27 +1,14 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import { View, Text, TouchableOpacity, TouchableHighlight, Button } from "react-native";
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
+import grabUserProfile from '../../actions/InAppActions';
 
-export default class Home extends Component {
+class Home extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      isModalVisible: false,
-    }
-  }
-
-  _showModal() {
-    this.setState({isModalVisible: true});
-  }
-
-  _hideModal() {
-    this.setState({isModalVisible: false});
-  }
-
-  componentDidMount() {
-    this.props.navigation.setParams({ showModal: this._showModal.bind(this) })
+  componentWillMount() {
+    this.props.grabUserProfile();
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -63,22 +50,16 @@ export default class Home extends Component {
     };
   };
 
-
   render() {
     return ( 
       <View style={Styles.container}>
-        <Text>A list of notes</Text>
-        
-        <Modal isVisible={this.state.isModalVisible}>
-          <View style={Styles.modalContainer}>
-            <Text>Hello!</Text>
-            <TouchableOpacity onPress={this._hideModal.bind(this)}>
-              <Text style={Styles.modalClose}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-        
-        
+        {this.props.interests && 
+          this.props.interests.map((interest,index) => {
+            return (
+              <Text key={"interest"+index} >{interest}</Text>
+            )
+          })
+        }
       </View>
     );
   };
@@ -110,3 +91,23 @@ const Styles = {
     textAlign: 'center',
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    interests: state.inApp.interests,
+    username: state.inApp.username
+  };
+}
+
+export default connect(mapStateToProps, {grabUserProfile})(Home);
+
+/*
+<Modal isVisible={this.state.isModalVisible}>
+          <View style={Styles.modalContainer}>
+            <Text>Hello!</Text>
+            <TouchableOpacity onPress={this._hideModal.bind(this)}>
+              <Text style={Styles.modalClose}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+*/
