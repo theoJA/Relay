@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { connect } from "react-redux";
 import { View, Text, TouchableOpacity } from 'react-native';
-import * as actions from '../../actions';
 
-class AddRemoveButton extends Component {
+export default class AddRemoveButton extends Component {
 
   constructor(props) {
     super(props);
@@ -16,16 +14,16 @@ class AddRemoveButton extends Component {
 
   async changeButtonColor() {
     if (!this.state.isAdded) {
-      await this.props.interestAdded(this.props.id);
-      //alert(this.props.interests);
+      this.props.addInterests(this.props.id);
       this.setState({ isAdded: true, buttonSymbol: '-', buttonColor: '#E74C3C' });
     }
     else {
-      await this.props.interestRemoved(this.props.id);
-      //alert(this.props.interests);
+      this.props.removeInterests(this.props.id);
       this.setState({ isAdded: false, buttonSymbol: '+', buttonColor: '#9CCC65' });
     }
   }
+
+
 
   render() {
     return (
@@ -62,10 +60,3 @@ const Styles = {
     flex: 1
   }
 }
-
-const mapStateToProps = ({ auth }) => {
-  const { interests } = auth;
-  return { interests };
-}
-
-export default connect(mapStateToProps, actions)(AddRemoveButton); 

@@ -11,10 +11,18 @@ import RenderSectionList from "../common/RenderSectionList";
 
 export default class GetStarted extends Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      interests: []
+    }
+  }
+
   static navigationOptions = ({ navigation }) => {
+    const { params = {} } = navigation.state;
     let headerRight = (
       <TouchableOpacity
-        onPress={() => {navigation.navigate('Register')}}
+        onPress={() => {navigation.navigate('Register', { interests: params.interests})}}
       >
         <View style={{marginRight: 10, borderColor: '#000', borderRadius: 5, borderWidth: 1, padding: 5}}>
           <Text style={{fontSize: 16}}>
@@ -31,6 +39,28 @@ export default class GetStarted extends Component {
     };
   };
 
+  componentDidMount() {
+    this.props.navigation.setParams({ interests: this.state.interests });
+  }
+
+  addInterests = (interest) => {
+    let { interests } = this.state;
+    interests = [...this.state.interests, interest];
+    this.props.navigation.setParams({ interests });
+    this.setState({
+      interests
+    });
+  }
+
+  removeInterests = (interest) => {
+    let { interests } = this.state;
+    let interestIndex = interests.indexOf(interest);
+    interests.splice(interestIndex, 1);
+    this.props.navigation.setParams({ interests });
+    this.setState({
+      interests
+    });
+  }
 
   render() {
     return (
@@ -40,7 +70,10 @@ export default class GetStarted extends Component {
           <Text style={{fontWeight: 'bold'}}> one </Text>field of interest:
         </Text>
         <ScrollView>
-          <RenderSectionList />
+          <RenderSectionList 
+            addInterests={this.addInterests}
+            removeInterests={this.removeInterests}
+          />
         </ScrollView>
       </View>
     );

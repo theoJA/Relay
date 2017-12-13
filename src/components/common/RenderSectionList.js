@@ -16,7 +16,7 @@ const SECTIONS = [
   }
 ];
 
-export default class SectList extends Component {
+export default class RenderSectionList extends Component {
  
   _renderHeader(section) {
     return (
@@ -31,6 +31,8 @@ export default class SectList extends Component {
     return (
       <View style={Styles.contentStyle}>
         <RenderFlatList 
+          addInterests={this.props.addInterests}
+          removeInterests={this.props.removeInterests}
           content={section.content}
         />
       </View>  
@@ -43,7 +45,7 @@ export default class SectList extends Component {
         underlayColor='#fff'
         sections={SECTIONS}
         renderHeader={this._renderHeader}
-        renderContent={this._renderContent}
+        renderContent={this._renderContent.bind(this)}
       />
     );
   }

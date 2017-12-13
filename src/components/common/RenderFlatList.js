@@ -17,6 +17,8 @@ export class RenderFlatList extends React.Component {
             <CardSection style={Styles.container}>
               <Text style={Styles.descStyle}>{item.subject}</Text>
               <AddRemoveButton 
+                addInterests={this.props.addInterests}
+                removeInterests={this.props.removeInterests}
                 id={item.subject}
               />
             </CardSection>
