@@ -19,19 +19,17 @@ export default class SignUp extends Component {
     };
   };
 
-  componentDidMount() {
-    this.props.navigation.setParams({ tellWhereMansAt: this.whereAmIAt });
-  }
-
-  whereAmIAt = () => {
-    alert('Im in register bruv. Skrrrraa pop pop');
+  showInterests() {
+    alert(this.props.navigation.state.params.interests);
   }
 
   render() {
     const { navigate } = this.props.navigation;
     return (
       <View style={Styles.container}>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={this.showInterests.bind(this)}
+        >
           <OauthButton name="logo-google" size={32} color="white" buttonColor="#EC7063" buttonTitle="Continue with Google"/>
         </TouchableOpacity>
 
@@ -44,7 +42,7 @@ export default class SignUp extends Component {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigate('RegisterEmail')}
+          onPress={() => navigate('RegisterEmail', { interests: this.props.navigation.state.params.interests})}
         >
           <OauthButton name="md-mail" size={32} color="white" buttonColor="#78909C" buttonTitle="Continue with Email"/>
         </TouchableOpacity>

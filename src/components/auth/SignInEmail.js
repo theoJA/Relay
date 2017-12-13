@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from "react-redux";
+import firebase from 'firebase';
 import { 
   View, 
   Text, 
@@ -11,12 +11,22 @@ import {
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationActions } from 'react-navigation';
-import * as actions from '../../actions';
 
-class SignInEmail extends Component {
+export default class SignInEmail extends Component {
   
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      user: null,
+      error: '',
+      loading: false,
+      interests: []
+    }
+  }
+
   // resets the navigation stack to go to another parent stack nav
-  // --> NEEDS FIXING!!!!!!
   changeToAppNavStack = NavigationActions.reset({
     index: 0,
     actions: [
@@ -54,26 +64,38 @@ class SignInEmail extends Component {
   }
 
   onEmailChange(text) {
-    this.props.emailChanged(text);
+    this.setState({
+      email: text
+    })
   }
 
   onPasswordChange(text) {
-    this.props.passwordChanged(text);
+    this.setState({
+      password: text
+    })
   }
 
   signInEmail = async () => {
-    const { email, password, interests } = this.props;
+    let { email, password, error } = this.state;
     
     Keyboard.dismiss;
-    await this.props.signInEmail({ email, password, interests });
-    
-    if (this.props.error === '') {
-      ToastAndroid.show('Welcome back!', ToastAndroid.LONG);
-      this.props.navigation.dispatch(this.changeToAppNavStack);
-    }
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(() => {
+          ToastAndroid.show('Welcome back!', ToastAndroid.LONG);
+          this.props.navigation.dispatch(this.changeToAppNavStack);
+        }
+      )
+      .catch((error) => {
+        ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+        this.setState({
+          error: 'Authentication Failed'
+        });
+      });
   }
 
   render() {
+    let { email, password, error } = this.state;
     return (
       <KeyboardAvoidingView 
         style={Styles.container}
@@ -88,7 +110,7 @@ class SignInEmail extends Component {
           placeholder="email@email.com" 
           style={Styles.textInputStyle}
           onChangeText={this.onEmailChange.bind(this)} 
-          value={this.props.email}
+          value={email}
           />
 
           <Text style={Styles.textInputTitleStyle}>
@@ -99,11 +121,11 @@ class SignInEmail extends Component {
           style={Styles.textInputStyle} 
           secureTextEntry={true}
           onChangeText={this.onPasswordChange.bind(this)} 
-          value={this.props.password} 
+          value={password} 
           />
 
           <Text style={Styles.errorTextStyle}>
-            {this.props.error}
+            {error}
           </Text>
 
         </View>
@@ -141,10 +163,3 @@ const Styles = {
     fontSize: 18
   }
 }
-
-const mapStateToProps = ({ auth }) => {
-  const { interests, email, password, error, loading } = auth;
-  return { interests, email, password, error, loading };
-};
-
-export default connect(mapStateToProps, actions)(SignInEmail);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from "react-redux";
+import firebase from 'firebase';
 import { 
   View, 
   Text, 
@@ -11,9 +11,20 @@ import {
 } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationActions } from 'react-navigation';
-import * as actions from '../../actions';
 
-class RegisterEmail extends Component {
+export default class RegisterEmail extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      user: null,
+      error: '',
+      loading: false,
+      interests: []
+    }
+  }
 
   // resets the navigation stack to prevent cyclical navigation
   changeToAppNavStack = NavigationActions.reset({
@@ -50,29 +61,46 @@ class RegisterEmail extends Component {
 
   componentDidMount() {
     this.props.navigation.setParams({ register: this.registerEmail });
+    this.setState({
+      interests: this.props.navigation.state.params.interests
+    })
   }
 
   onEmailChange(text) {
-    this.props.emailChanged(text);
+    this.setState({
+      email: text
+    })
   }
 
   onPasswordChange(text) {
-    this.props.passwordChanged(text);
+    this.setState({
+      password: text
+    })
   }
 
   registerEmail = async () => {
-    const { email, password, interests } = this.props;
-    
+    let { email, password, interests, error } = this.state;
+    let tempUserName = email.split('@')[0];
+
     Keyboard.dismiss;
-    await this.props.signInEmail({ email, password, interests });
     
-    if (this.props.error === '') {
-      ToastAndroid.show('Welcome to Relay!', ToastAndroid.LONG);
-      this.props.navigation.dispatch(this.changeToAppNavStack);
-    }
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(user => {
+        firebase.database().ref(`/users/${user.uid}/profile`)
+          .push({ interests, username: tempUserName, profilePic: 'null' });
+        ToastAndroid.show('Welcome to Relay!', ToastAndroid.LONG);
+        this.props.navigation.dispatch(this.changeToAppNavStack);
+      })
+      .catch((error) => {
+        ToastAndroid.show(`${error}`, ToastAndroid.LONG);
+        this.setState({
+          error: 'Authentication Failed'
+        });
+      });
   }
 
   render() {
+    let { email, password, error } = this.state;
     return (
       <KeyboardAvoidingView 
         style={Styles.container}
@@ -87,7 +115,7 @@ class RegisterEmail extends Component {
           placeholder="email@email.com" 
           style={Styles.textInputStyle}
           onChangeText={this.onEmailChange.bind(this)} 
-          value={this.props.email}
+          value={email}
           />
 
           <Text style={Styles.textInputTitleStyle}>
@@ -98,11 +126,11 @@ class RegisterEmail extends Component {
           style={Styles.textInputStyle} 
           secureTextEntry={true}
           onChangeText={this.onPasswordChange.bind(this)} 
-          value={this.props.password}
+          value={password}
           />
 
           <Text style={Styles.errorTextStyle}>
-            {this.props.error}
+            {error}
           </Text>
 
         </View>
@@ -140,10 +168,3 @@ const Styles = {
     fontSize: 18
   }
 };
-
-const mapStateToProps = ({ auth }) => {
-  const { interests, email, password, error, loading } = auth;
-  return { interests, email, password, error, loading };
-};
-
-export default connect(mapStateToProps, actions)(RegisterEmail);
