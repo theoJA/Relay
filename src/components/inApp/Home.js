@@ -1,14 +1,34 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import firebase from 'firebase';
 import { View, Text, TouchableOpacity, TouchableHighlight, Button } from "react-native";
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
-import grabUserProfile from '../../actions/InAppActions';
 
-class Home extends Component {
+export default class Home extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      profile: {
+        interests: [],
+        username: ''
+      }
+    }
+  }
 
   componentWillMount() {
-    this.props.grabUserProfile();
+    let { currentUser } = firebase.auth();
+
+    firebase.database().ref(`/users/${currentUser.uid}/profile`)
+    .on('value', snapshot => {
+      let profileId = Object.keys(snapshot.val())[0];
+      this.setState({
+        profile: {
+          interests: snapshot.val()[profileId].interests,
+          username: snapshot.val()[profileId].username
+        }
+      });
+    });
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -51,10 +71,11 @@ class Home extends Component {
   };
 
   render() {
+    //const { profile } = this.state;
     return ( 
       <View style={Styles.container}>
-        {this.props.interests && 
-          this.props.interests.map((interest,index) => {
+        {this.state.profile.interests && 
+          this.state.profile.interests.map((interest,index) => {
             return (
               <Text key={"interest"+index} >{interest}</Text>
             )
@@ -91,15 +112,6 @@ const Styles = {
     textAlign: 'center',
   }
 }
-
-const mapStateToProps = (state) => {
-  return {
-    interests: state.inApp.interests,
-    username: state.inApp.username
-  };
-}
-
-export default connect(mapStateToProps, {grabUserProfile})(Home);
 
 /*
 <Modal isVisible={this.state.isModalVisible}>
