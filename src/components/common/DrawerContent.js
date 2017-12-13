@@ -1,19 +1,27 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
 import firebase from "firebase";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, 
+  Image, ToastAndroid } from "react-native";
+  import Modal from 'react-native-modal';
 import { DrawerItems, NavigationActions } from "react-navigation";
-import { EvilIcons } from '@expo/vector-icons';
-import * as actions from '../../actions';
+import { Ionicons } from '@expo/vector-icons';
+//import { ImagePicker } from 'expo';
+import { takePhoto43Ratio, pickImage43Ratio } from "../imageHandler/ImageUploader";
 
-class DrawerContent extends Component {
+export default class DrawerContent extends Component {
 
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     username: null
-  //   }
-  // }
+  constructor(props) {
+    super(props);
+    this.state = {
+      profile: {
+        interests: [],
+        username: '',
+        profilePic: null
+      },
+      profileUid: null,
+      isProfPicModalVisible: false,
+    }
+  }
 
   logoutResetNavStack = NavigationActions.reset({
     index: 0,
@@ -22,25 +30,106 @@ class DrawerContent extends Component {
     ]
   });
 
+  showProfPicModal() {
+    this.setState({
+      isProfPicModalVisible: true
+    });
+  }
+
+  hideProfPicModal() {
+    this.setState({
+      isProfPicModalVisible: false
+    });
+  }
+
+  componentWillMount() {
+    let { currentUser } = firebase.auth();
+
+    firebase.database().ref(`/users/${currentUser.uid}/profile`)
+    .on('value', snapshot => {
+      let profileId = Object.keys(snapshot.val())[0];
+      this.setState({
+        profile: {
+          interests: snapshot.val()[profileId].interests,
+          username: snapshot.val()[profileId].username,
+          profilePic: snapshot.val()[profileId].profilePic
+        },
+        profileUid: profileId
+      });
+    });
+  }
+
   logoutFromRelay() {
-    console.log(firebase.User.email);
-
     firebase.auth().signOut();
+    ToastAndroid.show('Logged out', ToastAndroid.LONG);
+    this.props.navigation.dispatch(this.logoutResetNavStack);
+  }
 
-    console.log(firebase.User);
+  async setProfPicCamera() {
+    let { interests, username, profilePic } = this.state.profile;
+    await takePhoto43Ratio(imagelocation => {
+      this.setState({
+        profile: {
+          interests,
+          username,
+          profilePic: imagelocation
+        }
+      }, () => this.setProfPicInFirebase());
+    });
+    
+  }
 
-    // this.props.logoutRelay();
-    // this.props.navigation.dispatch(this.logoutResetNavStack);
+  async setProfPicGallery() {
+    let { interests, username, profilePic } = this.state.profile;
+    await pickImage43Ratio(imagelocation => {
+      this.setState({
+        profile: {
+          interests,
+          username,
+          profilePic: imagelocation
+        }
+      }, () => this.setProfPicInFirebase());
+    });
+  }
+
+  setProfPicInFirebase() {
+    let { profileUid, profile } = this.state;
+    let { currentUser } = firebase.auth();
+
+    firebase.database().ref(`/users/${currentUser.uid}/profile/${profileUid}`)
+      .update({ profilePic: profile.profilePic })
+      .then(() => {
+        console.log('Profile picture saved in Firebase');
+      });
+  }
+
+  renderProfPic() {
+    const { interests, username, profilePic } = this.state.profile;
+    if (profilePic === "null") {
+      return (
+        <Ionicons style={{ borderRadius: 8, margin: 10 }} 
+        name="md-person" size={120} color="black" />
+      )
+    } else {
+      return (
+        <Image 
+        source={{ uri: profilePic }} 
+        style={{ width: 120, height: 120, borderRadius: 8, margin: 10 }}/>
+      )
+    }
   }
 
   render() {
+    const { interests, username, profilePic } = this.state.profile;
     return <View style={Styles.container}>
         <View style={Styles.userIconContainer}>
-          <TouchableOpacity>
-            <EvilIcons name="user" size={150} color="black" />
+          <TouchableOpacity
+            onPress={this.showProfPicModal.bind(this)}
+          > 
+          { this.renderProfPic() }
           </TouchableOpacity>
           <TouchableOpacity>
-            <Text>{this.props.username}</Text>
+            <Text>{username}</Text>
           </TouchableOpacity>
         </View>
 
@@ -56,6 +145,37 @@ class DrawerContent extends Component {
 
         <View style={Styles.footerContainer}>
         </View>
+
+        <Modal isVisible={this.state.isProfPicModalVisible}>
+          <View style={Styles.modalContainer}>
+            <Text style={{fontSize: 18, fontWeight: 'bold',}}>Set profile picture</Text>
+            <View style={{ borderTopWidth: 1, borderColor: '#ddd', marginTop: 10, flexDirection: 'row'}}>
+
+              <View style={{ margin: 5, padding: 25 }}>
+                <TouchableOpacity style={{alignItems: 'center'}}
+                  onPress={this.setProfPicCamera.bind(this)}
+                >
+                  <Ionicons name="md-camera" size={52} color="black" />
+                  <Text>Camera</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={{ margin: 5, padding: 25 }}>
+                <TouchableOpacity style={{alignItems: 'center'}}
+                  onPress={this.setProfPicGallery.bind(this)}
+                >
+                  <Ionicons name="md-folder" size={52} color="black" />
+                  <Text>Gallery</Text>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+            <TouchableOpacity onPress={this.hideProfPicModal.bind(this)}>
+              <Text style={Styles.modalClose}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
       </View>;
   }; 
 }
@@ -106,14 +226,22 @@ const Styles = StyleSheet.create({
   logOutStyle: {
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    margin: 30,
+    borderRadius: 5,
+    alignItems: 'center'
+  },
+  modalClose: {
+    paddingBottom: 10,
+    paddingTop: 10,
+    paddingLeft: 25,
+    paddingRight: 25,
+    borderRadius: 5,
+    fontWeight: 'bold',
+    borderWidth: 2,
+    textAlign: 'center',
   }
 });
-
-const mapStateToProps = (state) => {
-  return {
-    interests: state.inApp.interests,
-    username: state.inApp.username
-  };
-}
-
-export default connect(mapStateToProps, actions)(DrawerContent);
