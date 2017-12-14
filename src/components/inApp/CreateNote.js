@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import firebase from "firebase";
 import Autocomplete from "react-native-autocomplete-input";
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, Button, ScrollView } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, 
+  Button, ScrollView, ToastAndroid, Keyboard } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 import NoteEditor from '../richTextEditor/NoteEditor'
 import { programs, computerScience, engineering } from "../../Programs_Subjects";
-
+import { uploadImageAsync } from "../imageHandler/ImageUploader";
 
 const SECTIONS = [
   {
@@ -25,40 +26,19 @@ export default class CreateNote extends Component {
     super(props);
     this.state = {
       isModalVisible: false,
-      title: null,
       tag: '',
       query: '',
       tagsArr: [],
       userInterests: [],
+      profileUid: '',
+      // these are the 3 states needed to be sent to Firebase
+      title: null,
+      articleData: null,
       addedInterests: [],
-      profileUid: ''
     }
+    this._setArticleData=this._setArticleData.bind(this);
   }
-
-  _showModal() {
-    this.setState({isModalVisible: true});
-  }
-
-  _hideModal() {
-    this.setState({isModalVisible: false});
-  }
-
-  componentWillMount() {
-    let { currentUser } = firebase.auth();
-    let interestArr = SECTIONS[0].content.concat(SECTIONS[1].content);
-    this.props.navigation.setParams({ showModal: this._showModal.bind(this) })
-
-
-    firebase.database().ref(`/users/${currentUser.uid}/profile`)
-    .on('value', snapshot => {
-      let profileId = Object.keys(snapshot.val())[0];
-      this.setState({
-        profileUid: profileId,
-        userInterests: interestArr
-      });
-    });
-  }
-
+  
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
   
@@ -82,6 +62,42 @@ export default class CreateNote extends Component {
       headerRight,
     };
   };
+
+  _showModal() {
+    this.setState({isModalVisible: true});
+  }
+
+  _hideModal() {
+    this.setState({isModalVisible: false});
+  }
+
+  componentWillMount() {
+    let { currentUser } = firebase.auth();
+    let interestArr = SECTIONS[0].content.concat(SECTIONS[1].content);
+    this.props.navigation.setParams({ showModal: this._showModal.bind(this) })
+
+    firebase.database().ref(`/users/${currentUser.uid}/profile`)
+    .on('value', snapshot => {
+      let profileId = Object.keys(snapshot.val())[0];
+      this.setState({
+        profileUid: profileId,
+        userInterests: interestArr
+      });
+    });
+  }
+
+  _setTitle(text) {
+    this.setState({
+      title: text
+    });
+  }
+
+  _setArticleData(editorState) {
+    // console.log(editorState);
+    this.setState({
+      articleData: editorState
+    })
+  }
 
   _findTag(query) {
     if (query === '') {
@@ -110,6 +126,42 @@ export default class CreateNote extends Component {
     });
   }
 
+  async _uploadImagesInArticleData() {
+    let { articleData, title, addedInterests } = this.state;
+    let uploadResponse, uploadResult;
+    
+    Keyboard.dismiss();
+    ToastAndroid.show('Uploading...', ToastAndroid.LONG);
+    for (let i = 0; i < articleData.typeArr.length; i ++) {
+      if (articleData.typeArr[i] === 'image') {
+        try {
+          uploadResponse = await uploadImageAsync(articleData.dataArr[i]);
+          uploadResult = await uploadResponse.json();
+          articleData.dataArr[i] = uploadResult.location;
+          ToastAndroid.show('Uploading...', ToastAndroid.SHORT);
+        } catch (e) {
+          ToastAndroid.show('Upload failed', ToastAndroid.LONG);
+        }
+      }
+    }
+    this.setState({
+      articleData
+    }, () => {
+      this._publishArticle();
+    }); 
+  }
+
+  _publishArticle() {
+    let { articleData, title, addedInterests } = this.state;
+    let { currentUser } = firebase.auth();
+
+    firebase.database().ref(`/users/${currentUser.uid}/articles`)
+      .push({ articleData, title, tags: addedInterests });
+    ToastAndroid.show('Article posted!', ToastAndroid.LONG);
+    this.props.navigation.goBack();
+  }
+
+
   render() {
     const { query, addedInterests } = this.state;
     const interests = this._findTag(query);
@@ -118,7 +170,9 @@ export default class CreateNote extends Component {
     return (
       <View style={Styles.container}>
 
-        <NoteEditor/>
+        <NoteEditor
+          setArticleData={this._setArticleData}
+        />
 
         <Modal isVisible={this.state.isModalVisible}>
           <View style={Styles.modalContainer}>
@@ -131,7 +185,7 @@ export default class CreateNote extends Component {
             autoCapitalize={'sentences'}
             multiline={true} 
             numberOfLines={2} 
-            onChangeText={(text) => this.setState({ title: text })}
+            onChangeText={this._setTitle.bind(this)}
             value={this.state.title}
             />
 
@@ -186,7 +240,7 @@ export default class CreateNote extends Component {
               <TouchableOpacity onPress={this._hideModal.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: '#000', color: '#fff' }]}>Back</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => {this.props.navigation.goBack()}}>
+              <TouchableOpacity onPress={this._uploadImagesInArticleData.bind(this)}>
                 <Text style={[Styles.modalButton, { backgroundColor: "#9CCC65", borderColor: "#9CCC65", color: '#fff' }]}>Publish</Text>
               </TouchableOpacity>
             </View>
@@ -198,27 +252,6 @@ export default class CreateNote extends Component {
     )
   }
 }
-
-/*
-<Autocomplete 
-              style={[Styles.textInputStyle,{ flex: 7, fontSize: 13 }]}
-              autoCapitalize="none"
-              autoCorrect={false}
-              multiline={true} 
-              numberOfLines={1} 
-              data={interests.length === 1 && comp(query, interests[0].subject) ? [] : interests}
-              defaultValue={query}
-              onChangeText={text => this.setState({ query: text })}
-              placeholder="Enter tag"
-              renderItem={({ subject }) => (
-                <TouchableOpacity onPress={() => this.setState({ query: subject })}>
-                  <Text>
-                    {subject}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              />
-*/
 
 const Styles = StyleSheet.create({
   container: {
