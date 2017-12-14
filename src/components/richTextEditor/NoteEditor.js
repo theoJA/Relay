@@ -3,20 +3,20 @@ import {
   StyleSheet, Image, View, Button, Text, TouchableOpacity, 
   TextInput, ScrollView, Dimensions, ToastAndroid } from "react-native";
 import Modal from 'react-native-modal';
-import { Ionicons, Entypo, MaterialCommunityIcons, EvilIcons } from '@expo/vector-icons';
+import { Ionicons, Entypo, MaterialCommunityIcons, EvilIcons, FontAwesome } from '@expo/vector-icons';
 import { ImagePicker } from 'expo';
 
 
 const colors = {
-  inactive: '#ECEFF1',
-  active: '#AEB6BF'
+  inactive: '#fff',
+  active: '#C5E1A5'
 };
 
 const textStyles = {
   normal: { fontSize: 15, fontWeight: 'normal', fontStyle: 'normal'},
   H1: { fontSize: 25, fontWeight: 'bold', fontStyle: 'normal'},
   H2: { fontSize: 20, fontWeight: 'bold', fontStyle: 'normal'},
-  script: { fontSize: 15, backgroundColor: '#AED6F1', fontWeight: 'normal', fontStyle: 'normal', marginBottom: 10 },
+  script: { fontSize: 15, backgroundColor: '#D5D8DC', fontWeight: 'normal', fontStyle: 'normal', padding: 15 },
   quote: { fontSize: 17, fontStyle: 'italic', fontWeight: 'normal', paddingLeft: 20, paddingRight: 20, paddingTop: 5, paddingBottom: 5 },
   link: { fontSize: 17, textDecorationLine: 'underline' },
 };
@@ -41,6 +41,8 @@ export default class NoteEditor extends Component {
     this.state = {
       linkModalVisible: false,
       editModalVisible: false,
+      imageModalVisible: false,
+      imageFrom: 'gallery',
       buttonStates: initialButtonStates,
       activeTextStyle: 'normal',
       data: null,
@@ -83,6 +85,17 @@ export default class NoteEditor extends Component {
   _hideEditModal() {
     this.setState({editModalVisible: false});
   };
+
+  _showImageModal() {
+    this.setState({
+      imageModalVisible: true
+    });
+  }
+  _hideImageModal() {
+    this.setState({
+      imageModalVisible: false
+    });
+  }
 // --------------------------
   
 
@@ -146,11 +159,19 @@ export default class NoteEditor extends Component {
   }
 
   _insertImage = async () => {
-    let { data, editorState, selectedParag, editingStatus, insertBetween } = this.state; 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      //aspect: [16, 11],
-    });
+    let { imageFrom, data, editorState, selectedParag, editingStatus, insertBetween } = this.state; 
+    let result;
+    
+    if (imageFrom === 'gallery') {
+      result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true
+      });
+    } else if (imageFrom === 'camera') {
+      result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true
+      });
+    }
+
     if (!result.cancelled) {
 
 
@@ -469,7 +490,7 @@ export default class NoteEditor extends Component {
     let { editingStatus, insertBetween } = this.state; 
     if (editingStatus.editing || insertBetween.inserting) {
       return (
-        <View style={{ flexDirection: 'row', borderBottomWidth: 2, borderBottomColor: "#ccc" }}>
+        <View style={{ flexDirection: 'row' }}>
           <Text style={{ flex: 7, textAlign: 'center', paddingTop: 15, backgroundColor: '#C5E1A5', fontWeight: 'bold' }}>
             {editingStatus.editing ? editingStatus.editingInstructions : insertBetween.inserting ? insertBetween.insertingInstructions : null}
           </Text>
@@ -478,7 +499,7 @@ export default class NoteEditor extends Component {
             onPress={this._cancelEditing.bind(this)}
           >
             <Text
-            style={[Styles.modalButton, { padding: 3, backgroundColor: "#ECEFF1" }]}
+            style={[Styles.modalButton, { padding: 3, backgroundColor: "#000", fontWeight: 'bold', color: '#fff' }]}
             >
               Cancel
             </Text>            
@@ -487,6 +508,23 @@ export default class NoteEditor extends Component {
       )
     }
   }
+
+  _setImageCamera() {
+    this.setState({
+      imageFrom: 'camera'
+    }, () => {
+      this._insertImage();
+    })
+  }
+
+  _setImageGallery() {
+    this.setState({
+      imageFrom: 'gallery'
+    }, () => {
+      this._insertImage();
+    })
+  }
+
 // -----------------------
 
   render() {
@@ -537,13 +575,13 @@ export default class NoteEditor extends Component {
 
         <View style={Styles.editorButtonsContainer}>
           <TouchableOpacity onPress={this._insertText.bind(this)}>
-            <Text style={Styles.editorButtons}>+ Text</Text>
+            <Text style={Styles.editorButtons}><FontAwesome name="plus-circle" size={15} color="black" /><Entypo name="text" size={20} color="black" /></Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={this._insertImage}>
-            <Text style={Styles.editorButtons}>+ Image</Text>
+          <TouchableOpacity onPress={this._showImageModal.bind(this)}>
+            <Text style={Styles.editorButtons}><FontAwesome name="plus-circle" size={15} color="black" /><Entypo name="image-inverted" size={20} color="black" /></Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={this._showLinkModal.bind(this)}>
-            <Text style={Styles.editorButtons}>+ Link</Text>
+            <Text style={Styles.editorButtons}><FontAwesome name="plus-circle" size={15} color="black" /><Entypo name="link" size={20} color="black" /></Text>
           </TouchableOpacity>
         </View>
 
@@ -565,7 +603,7 @@ export default class NoteEditor extends Component {
         <Modal isVisible={this.state.linkModalVisible}>
           <View style={Styles.modalContainer}>
             
-            <Text style={Styles.textInputTitleStyle}>
+            <Text style={[Styles.textInputTitleStyle, { marginTop: 10, paddingBottom: 10 }]}>
               Add a link
             </Text>
             <TextInput 
@@ -579,49 +617,77 @@ export default class NoteEditor extends Component {
 
             <View style={{flexDirection: 'row', marginTop: 20}}>
               <TouchableOpacity onPress={this._hideLinkModal.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: '#AED6F1' }]}>Back</Text>
+                <Text style={[Styles.modalButton, { backgroundColor: '#000', color: '#fff' }]}>Back</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={this._insertLink.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Add</Text>
+                <Text style={[Styles.modalButton, { backgroundColor: "#9CCC65", borderColor: "#9CCC65", color: '#fff' }]}>Add</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
 
         <Modal isVisible={this.state.editModalVisible}>
-          <View style={Styles.modalContainer}>
+          <View style={[Styles.modalContainer, { alignItems: 'center'}]}>
             
-            <Text style={Styles.textInputTitleStyle}>
-              {`Select an option for parag ${this.state.selectedParag.index}`}
+            <Text style={[Styles.textInputTitleStyle, { marginTop: 10, paddingBottom: 10, borderBottomWidth: 1, borderColor: '#ddd' }]}>
+              {`Select an option`}
             </Text>
 
-            <View style={{flexDirection: 'row', marginTop: 20}}>
-              <TouchableOpacity onPress={this._hideEditModal.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#AED6F1" }]}>Back</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={this._startEditing.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#C5E1A5" }]}>Edit</Text>
-              </TouchableOpacity>
-
-              
-
-              <TouchableOpacity onPress={this._deleteParag.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#EF9A9A" }]}>Delete</Text>
-              </TouchableOpacity>
-
-            </View>
-            <View style={{flexDirection: 'row'}}>
+            <View style={{flexDirection: 'row', marginTop: 10}}>
               <TouchableOpacity onPress={this._insertAbove.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#ddd" }]}>Insert 
-                  <Entypo style={[Styles.editorButtons, {backgroundColor: '#ddd', margin: 20 }]} name="arrow-up" size={20} color="black" />
+                <Text style={[Styles.modalButton, { backgroundColor: '#fff' }]}>Insert 
+                  <Entypo style={[Styles.editorButtons, { backgroundColor: '#fff' }]} name="arrow-up" size={20} color="black" />
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={this._insertBelow.bind(this)}>
-                <Text style={[Styles.modalButton, { backgroundColor: "#ddd" }]}>Insert 
-                  <Entypo style={[Styles.editorButtons, {backgroundColor: '#ddd'}]} name="arrow-down" size={20} color="black" />
+                <Text style={[Styles.modalButton, { backgroundColor: '#fff' }]}>Insert 
+                  <Entypo style={[Styles.editorButtons, { backgroundColor: '#fff' }]} name="arrow-down" size={20} color="black" />
                 </Text>
               </TouchableOpacity>
             </View>
+
+            <View style={{flexDirection: 'row', marginTop: -5 }}>
+              <TouchableOpacity onPress={this._hideEditModal.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: '#000', color: '#fff' }]}>Back</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this._startEditing.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#3498DB", borderColor: '#3498DB',color: '#fff' }]}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this._deleteParag.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#E74C3C", borderColor: '#E74C3C',color: '#fff' }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+
+          </View>
+        </Modal>
+
+        <Modal isVisible={this.state.imageModalVisible}>
+          <View style={Styles.imageModalContainer}>
+            <Text style={{fontSize: 18, fontWeight: 'bold',}}>Select an option</Text>
+            <View style={{ borderTopWidth: 1, borderColor: '#ddd', marginTop: 10, flexDirection: 'row'}}>
+
+              <View style={{ margin: 5, padding: 25 }}>
+                <TouchableOpacity style={{alignItems: 'center'}}
+                  onPress={this._setImageCamera.bind(this)}
+                >
+                  <Ionicons name="md-camera" size={52} color="black" />
+                  <Text>Camera</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={{ margin: 5, padding: 25 }}>
+                <TouchableOpacity style={{alignItems: 'center'}}
+                  onPress={this._setImageGallery.bind(this)}
+                >
+                  <Ionicons name="md-folder" size={52} color="black" />
+                  <Text>Gallery</Text>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+            <TouchableOpacity onPress={this._hideImageModal.bind(this)}>
+              <Text style={Styles.modalClose}>Close</Text>
+            </TouchableOpacity>
           </View>
         </Modal>
 
@@ -633,11 +699,11 @@ export default class NoteEditor extends Component {
 const Styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ECEFF1',
+    backgroundColor: '#fff',
   },
   scrollingContainer: {
     flex: 1,
-    backgroundColor: '#ECEFF1',
+    backgroundColor: '#fff',
     margin: 10,
   },
   textInput: {
@@ -652,7 +718,7 @@ const Styles = StyleSheet.create({
   editorButtons: {
     margin: 5,
     borderColor: '#000', 
-    borderRadius: 5, 
+    borderRadius: 3, 
     borderWidth: 1, 
     padding: 8,
     fontWeight: 'bold',
@@ -664,13 +730,32 @@ const Styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'flex-start',
   },
-  modalButton: {
+  imageModalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    margin: 30,
     borderRadius: 5,
-    borderWidth: 1, 
+    alignItems: 'center'
+  },
+  modalButton: {
+    borderRadius: 2,
+    borderWidth: 1,
     padding: 8,
+    paddingRight: 15,
+    paddingLeft: 15,
     textAlign: 'center',
     margin: 10,
     fontWeight: 'bold'
+  },
+  modalClose: {
+    paddingBottom: 10,
+    paddingTop: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    borderRadius: 5,
+    fontWeight: 'bold',
+    borderWidth: 1,
+    textAlign: 'center',
   },
   textInputTitleStyle: {
     color: "#566573",
