@@ -443,8 +443,10 @@ export default class NoteEditor extends Component {
       }
     });  
       
-    let tempTagsArr = tagsArr
+    // pass the editorState to CreateNote
+    this.props.setArticleData(editorStateObj);
 
+    let tempTagsArr = tagsArr
     this.setState({ tagsArr: tempTagsArr });
   };
 // ---------------------------
