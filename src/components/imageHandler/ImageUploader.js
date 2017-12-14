@@ -99,5 +99,6 @@ export {
   takePhoto43Ratio,
   takePhotoNoRatio,
   pickImage43Ratio,
-  pickImageNoRatio
+  pickImageNoRatio,
+  uploadImageAsync
 };
