@@ -87,7 +87,7 @@ export default class RegisterEmail extends Component {
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(user => {
         firebase.database().ref(`/users/${user.uid}/profile`)
-          .push({ interests, username: tempUserName, profilePic: 'null' });
+          .push({ interests, username: tempUserName, profilePic: 'null', bookmarked: 'null' });
         ToastAndroid.show('Welcome to Relay!', ToastAndroid.LONG);
         this.props.navigation.dispatch(this.changeToAppNavStack);
       })

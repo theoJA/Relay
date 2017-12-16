@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StackNavigator, DrawerNavigator } from 'react-navigation';
-import { Home, MyNotes, Bookmarked, AppSettings, CreateNote } from '../inApp';
+import { Home, MyNotes, Bookmarked, AppSettings, CreateNote, ViewNote } from '../inApp';
 import {LogoScreen, Interests, Register, SignIn, RegisterEmail, SignInEmail } from '../auth';
 import DrawerContent from "../common/DrawerContent";
 import MainNav from './MainNav';
@@ -20,7 +20,10 @@ const HomeStack = StackNavigator({
   },
   Logout: {
     screen: LogoScreen, 
-  }
+  },
+  ViewNote: {
+    screen: ViewNote,
+  },
 });
 
 // Contains: MyNotes, Search, Note
@@ -29,7 +32,7 @@ const MyNotesStack = StackNavigator({
     screen: MyNotes,
     navigationOptions: {
       drawer: {
-        label: 'My Notes',
+        label: 'My Articles',
       },
     },
   },
@@ -59,7 +62,7 @@ const SettingStack = StackNavigator({
     screen: AppSettings,
     navigationOptions: {
       drawer: {
-        label: 'Settings',
+        label: 'Interests',
       },
     },
   },

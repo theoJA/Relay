@@ -7,7 +7,7 @@ export default class App extends Component {
   
   constructor(props) {
     super(props);
-    console.ignoredYellowBox = ['Setting a timer'];
+    console.ignoredYellowBox = ['Setting a timer', 'Warning: Can', 'Warning: Failed'];
   }
 
   componentWillMount() {

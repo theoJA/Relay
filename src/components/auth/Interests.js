@@ -22,7 +22,7 @@ export default class GetStarted extends Component {
     const { params = {} } = navigation.state;
     let headerRight = (
       <TouchableOpacity
-        onPress={() => {navigation.navigate('Register', { interests: params.interests})}}
+        onPress={() => {navigation.navigate('RegisterEmail', { interests: params.interests})}}
       >
         <View style={{marginRight: 10, borderColor: '#000', borderRadius: 5, borderWidth: 1, padding: 5}}>
           <Text style={{fontSize: 16}}>

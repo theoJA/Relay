@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import firebase from "firebase";
 import { View, Text, TouchableOpacity, StyleSheet, 
-  Image, ToastAndroid } from "react-native";
+  Image, ToastAndroid, TextInput } from "react-native";
   import Modal from 'react-native-modal';
 import { DrawerItems, NavigationActions } from "react-navigation";
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,8 @@ export default class DrawerContent extends Component {
       },
       profileUid: null,
       isProfPicModalVisible: false,
+      isUsernameModalVisible: false,
+      tempUsername: ''
     }
   }
 
@@ -35,11 +37,22 @@ export default class DrawerContent extends Component {
       isProfPicModalVisible: true
     });
   }
-
   hideProfPicModal() {
     this.setState({
       isProfPicModalVisible: false
     });
+  }
+
+  showUsernameModal() {
+    this.setState({
+      isUsernameModalVisible: true
+    })
+  }
+  hideUsernameModal() {
+    this.setState({
+      tempUsername: '',
+      isUsernameModalVisible: false
+    })
   }
 
   componentWillMount() {
@@ -99,7 +112,7 @@ export default class DrawerContent extends Component {
     firebase.database().ref(`/users/${currentUser.uid}/profile/${profileUid}`)
       .update({ profilePic: profile.profilePic })
       .then(() => {
-        console.log('Profile picture saved in Firebase');
+        ToastAndroid.show('Profile picture changed', ToastAndroid.LONG);
       });
   }
 
@@ -119,6 +132,20 @@ export default class DrawerContent extends Component {
     }
   }
 
+  setNewUsername() {
+    let { tempUsername, profileUid } = this.state;
+    let { currentUser } = firebase.auth();
+    
+    firebase.database().ref(`/users/${currentUser.uid}/profile/${profileUid}`)
+      .update({ username: tempUsername })
+      .then(() => {
+        ToastAndroid.show('Username changed', ToastAndroid.LONG);
+        this.setState({
+          isUsernameModalVisible: false
+        });
+      });
+  }
+
   render() {
     const { interests, username, profilePic } = this.state.profile;
     return <View style={Styles.container}>
@@ -128,7 +155,9 @@ export default class DrawerContent extends Component {
           > 
           { this.renderProfPic() }
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={this.showUsernameModal.bind(this)}
+          >
             <Text>{username}</Text>
           </TouchableOpacity>
         </View>
@@ -173,6 +202,32 @@ export default class DrawerContent extends Component {
             <TouchableOpacity onPress={this.hideProfPicModal.bind(this)}>
               <Text style={Styles.modalClose}>Close</Text>
             </TouchableOpacity>
+          </View>
+        </Modal>
+
+        <Modal isVisible={this.state.isUsernameModalVisible}>
+          <View style={Styles.usernameModalContainer}>
+            
+            <Text style={[Styles.textInputTitleStyle, { marginTop: 10, paddingBottom: 10 }]}>
+              Set username
+            </Text>
+            <TextInput 
+            style={Styles.textInputStyle}
+            autoCapitalize={'sentences'}
+            multiline={true} 
+            numberOfLines={2} 
+            onChangeText={(text) => this.setState({ tempUsername: text })}
+            value={this.state.tempUsername}
+            />
+
+            <View style={{flexDirection: 'row', marginTop: 20}}>
+              <TouchableOpacity onPress={this.hideUsernameModal.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: '#000', color: '#fff' }]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={this.setNewUsername.bind(this)}>
+                <Text style={[Styles.modalButton, { backgroundColor: "#9CCC65", borderColor: "#9CCC65", color: '#fff' }]}>Apply</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </Modal>
 
@@ -234,6 +289,13 @@ const Styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center'
   },
+  usernameModalContainer: {
+    backgroundColor: '#fff',
+    padding: 10,
+    margin: 30,
+    borderRadius: 5,
+    justifyContent: 'flex-start',
+  },
   modalClose: {
     paddingBottom: 10,
     paddingTop: 10,
@@ -243,5 +305,27 @@ const Styles = StyleSheet.create({
     fontWeight: 'bold',
     borderWidth: 2,
     textAlign: 'center',
-  }
+  },
+  textInputTitleStyle: {
+    color: "#566573",
+    fontSize: 16,
+    marginTop: 20,
+    marginLeft: 5,
+    fontWeight: 'bold'
+  },
+  textInputStyle: {
+    paddingTop: 5,
+    paddingBottom: 10,
+    padding: 5,
+  },
+  modalButton: {
+    borderRadius: 2,
+    borderWidth: 1,
+    padding: 8,
+    paddingRight: 15,
+    paddingLeft: 15,
+    textAlign: 'center',
+    margin: 10,
+    fontWeight: 'bold'
+  },
 });

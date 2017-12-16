@@ -8,6 +8,7 @@ import Modal from 'react-native-modal';
 import NoteEditor from '../richTextEditor/NoteEditor'
 import { programs, computerScience, engineering } from "../../Programs_Subjects";
 import { uploadImageAsync } from "../imageHandler/ImageUploader";
+import moment from "moment";
 
 const SECTIONS = [
   {
@@ -35,6 +36,8 @@ export default class CreateNote extends Component {
       title: null,
       articleData: null,
       addedInterests: [],
+      createdDate: null,
+      authorUserId: null
     }
     this._setArticleData=this._setArticleData.bind(this);
   }
@@ -151,12 +154,16 @@ export default class CreateNote extends Component {
     }); 
   }
 
-  _publishArticle() {
-    let { articleData, title, addedInterests } = this.state;
-    let { currentUser } = firebase.auth();
+  async _publishArticle() {
+    let { articleData, title, addedInterests, createdDate, authorUserId } = this.state;
+    let { currentUser } = await firebase.auth();
 
-    firebase.database().ref(`/users/${currentUser.uid}/articles`)
-      .push({ articleData, title, tags: addedInterests });
+    // setting date and authorUID
+    createdDate = await moment().format("YYYYMMDD");
+    authorUserId = await currentUser.uid;
+
+    firebase.database().ref(`/articles`)
+      .push({ title, articleData, tags: addedInterests, createdDate, authorUserId });
     ToastAndroid.show('Article posted!', ToastAndroid.LONG);
     this.props.navigation.goBack();
   }

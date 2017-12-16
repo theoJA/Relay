@@ -31,7 +31,7 @@ export default class AuthScreen extends Component {
             <Text> </Text>
           </Text>
           <TouchableOpacity
-              onPress={() => navigate('SignIn')} 
+              onPress={() => navigate('SignInEmail')} 
           >
             <Text style={{color: 'blue'}}>
               Sign in
